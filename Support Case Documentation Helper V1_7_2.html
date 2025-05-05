@@ -1,0 +1,3475 @@
+<!DOCTYPE html><html lang="en"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ServiceNow Case Documentation Helper</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            color: #333;
+            background-color: #fff;
+            transition: background-color 0.2s, color 0.2s;
+            padding: 2rem 1rem;
+        }
+        
+        /* Dark mode */
+        body.dark {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        
+        /* Container and layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .flex-col {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        @media (min-width: 1024px) {
+            .grid-cols-2 {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .grid-cols-3 {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+        
+        /* Typography */
+        h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            color: #5D5CDE;
+        }
+        
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        h3 {
+            font-size: 1.125rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        
+        p {
+            margin-bottom: 0.5rem;
+        }
+        
+        label {
+            font-weight: 500;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            cursor: pointer;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            color: white;
+            margin: 0.25rem;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 1.125rem;
+        }
+        
+        .tab.active {
+            background-color: #5D5CDE;
+            font-weight: 700;
+        }
+        
+        .tab:not(.active) {
+            background-color: #6b7280;
+        }
+        
+        .tab:not(.active):hover {
+            background-color: #4b5563;
+        }
+        
+        /* Cards */
+        .card {
+            background-color: #f3f4f6;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        body.dark .card {
+            background-color: #2d3748;
+        }
+        
+        /* Form elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        input[type="text"],
+        input[type="file"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+            background-color: white;
+            font-size: 1rem;
+        }
+        
+        body.dark input[type="text"],
+        body.dark input[type="file"],
+        body.dark textarea,
+        body.dark select {
+            background-color: #374151;
+            border-color: #4b5563;
+            color: #e0e0e0;
+        }
+        
+        input[type="checkbox"] {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-right: 0.75rem;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Buttons */
+        button {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            border: none;
+            transition: opacity 0.2s;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-primary {
+            background-color: #5D5CDE;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: #9ca3af;
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: #f59e0b;
+            color: white;
+        }
+        
+        /* Lists */
+        .list-container {
+            max-height: 350px;
+            overflow-y: auto;
+            background-color: white;
+            border-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+            margin-bottom: 0.5rem;
+        }
+        
+        body.dark .list-container {
+            background-color: #374151;
+            border-color: #4b5563;
+        }
+        
+        .list-item {
+            padding: 0.75rem;
+            cursor: pointer;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        body.dark .list-item {
+            border-color: #4b5563;
+        }
+        
+        .list-item:hover {
+            background-color: rgba(93, 92, 222, 0.1);
+        }
+        
+        body.dark .list-item:hover {
+            background-color: rgba(93, 92, 222, 0.2);
+        }
+        
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s;
+        }
+        
+        body.dark .task-item {
+            border-color: #4b5563;
+        }
+        
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        
+        .task-label {
+            cursor: pointer;
+            flex-grow: 1;
+        }
+        
+        /* Evidence tag styling */
+        .evidence-required {
+            display: inline-block;
+            background-color: #f97316;
+            color: white;
+            font-size: 0.7rem;
+            border-radius: 0.25rem;
+            padding: 0.15rem 0.35rem;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+        
+        body.dark .evidence-required {
+            background-color: #ea580c;
+        }
+
+        /* Checklist tag styling */
+        .checklist-tag {
+            display: inline-block;
+            background-color: #0ea5e9;
+            color: white;
+            font-size: 0.7rem;
+            border-radius: 0.25rem;
+            padding: 0.15rem 0.35rem;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+        
+        body.dark .checklist-tag {
+            background-color: #0284c7;
+        }
+
+        .task-counter {
+            min-width: 3rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            margin-left: 0.5rem;
+            background-color: #ef4444;
+            color: white;
+        }
+        
+        .task-counter.complete {
+            background-color: #10b981;
+        }
+        
+        /* Documentation preview */
+        .preview {
+            background-color: white;
+            border-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+            padding: 1rem;
+            min-height: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        body.dark .preview {
+            background-color: #374151;
+            border-color: #4b5563;
+            color: #e0e0e0;
+        }
+        
+        /* Helper text */
+        .text-muted {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        body.dark .text-muted {
+            color: #9ca3af;
+        }
+        
+        /* Utilities */
+        .hidden {
+            display: none;
+        }
+        
+        .flex {
+            display: flex;
+        }
+        
+        .justify-between {
+            justify-content: space-between;
+        }
+        
+        .items-center {
+            align-items: center;
+        }
+
+        .items-end {
+            align-items: flex-end;
+        }
+        
+        .space-x-2 > * + * {
+            margin-left: 0.5rem;
+        }
+
+        .space-x-4 > * + * {
+            margin-left: 1rem;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        body.dark ::-webkit-scrollbar-track {
+            background: #2d2d2d;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        body.dark ::-webkit-scrollbar-thumb {
+            background: #666;
+        }
+        
+        body.dark ::-webkit-scrollbar-thumb:hover {
+            background: #888;
+        }
+        
+        /* Delete button */
+        .delete-btn {
+            color: #ef4444;
+            margin-left: 1rem;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        .delete-btn:hover {
+            color: #b91c1c;
+        }
+        
+        /* Flex with gap */
+        .flex-gap {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        /* Header with actions */
+        .header-with-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        /* Empty task container */
+        .empty-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 150px;
+            background-color: white;
+            border-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+        }
+        
+        body.dark .empty-container {
+            background-color: #374151;
+            border-color: #4b5563;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #d1d5db;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        body.dark .footer {
+            border-color: #4b5563;
+            color: #9ca3af;
+        }
+
+        /* Version tag */
+        .version-tag {
+            font-size: 0.875rem;
+            color: #6b7280;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        body.dark .version-tag {
+            color: #9ca3af;
+        }
+
+        /* Navigation */
+        .navigation {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .navigation-item {
+            flex: 1;
+        }
+
+        /* Import progress */
+        .import-progress {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #e0f2fe;
+            color: #075985;
+            border-radius: 0.375rem;
+        }
+
+        body.dark .import-progress {
+            background-color: #082f49;
+            color: #7dd3fc;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.375rem;
+        }
+
+        .alert-info {
+            background-color: #e0f2fe;
+            color: #075985;
+        }
+
+        .alert-success {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .alert-warning {
+            background-color: #ffedd5;
+            color: #9a3412;
+        }
+
+        body.dark .alert-info {
+            background-color: #082f49;
+            color: #7dd3fc;
+        }
+
+        body.dark .alert-success {
+            background-color: #052e16;
+            color: #86efac;
+        }
+
+        body.dark .alert-warning {
+            background-color: #431407;
+            color: #fdba74;
+        }
+
+        /* CSV import area */
+        .import-textarea {
+            width: 100%;
+            min-height: 200px;
+            font-family: monospace;
+            white-space: pre;
+            resize: vertical;
+        }
+
+        /* Table styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            background-color: white;
+        }
+
+        body.dark .data-table {
+            background-color: #374151;
+        }
+
+        .data-table th, 
+        .data-table td {
+            border: 1px solid #d1d5db;
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        body.dark .data-table th,
+        body.dark .data-table td {
+            border-color: #4b5563;
+        }
+
+        .data-table th {
+            background-color: #f3f4f6;
+            font-weight: 600;
+        }
+
+        body.dark .data-table th {
+            background-color: #1f2937;
+        }
+
+        /* Global search results */
+        .search-result-item {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+            cursor: pointer;
+        }
+
+        body.dark .search-result-item {
+            border-color: #4b5563;
+        }
+
+        .search-result-item:hover {
+            background-color: rgba(93, 92, 222, 0.1);
+        }
+
+        body.dark .search-result-item:hover {
+            background-color: rgba(93, 92, 222, 0.2);
+        }
+
+        .search-result-path {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-style: italic;
+            margin-bottom: 0.25rem;
+        }
+
+        body.dark .search-result-path {
+            color: #9ca3af;
+        }
+
+        .search-result-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .search-result-task {
+            padding: 0.25rem 0.5rem;
+            background-color: #f3f4f6;
+            border-radius: 0.25rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        body.dark .search-result-task {
+            background-color: #374151;
+        }
+
+        .search-result-task:hover {
+            background-color: #e5e7eb;
+        }
+
+        body.dark .search-result-task:hover {
+            background-color: #4b5563;
+        }
+
+        .search-result-task.selected {
+            background-color: #5D5CDE;
+            color: white;
+        }
+
+        body.dark .search-result-task.selected {
+            background-color: #5D5CDE;
+        }
+
+        .search-task-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+
+        /* Tab buttons */
+        .sub-tab-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .sub-tab-button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            background-color: #e5e7eb;
+            color: #4b5563;
+            cursor: pointer;
+            border: none;
+            font-weight: 500;
+        }
+
+        body.dark .sub-tab-button {
+            background-color: #374151;
+            color: #9ca3af;
+        }
+
+        .sub-tab-button.active {
+            background-color: #5D5CDE;
+            color: white;
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background-color: #f9fafb;
+            border-radius: 0.375rem;
+        }
+
+        body.dark .breadcrumbs {
+            background-color: #1f2937;
+        }
+
+        .breadcrumb-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .breadcrumb-separator {
+            margin: 0 0.25rem;
+            color: #9ca3af;
+        }
+
+        /* Debug section */
+        .debug-section {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f3f4f6;
+            border-radius: 0.375rem;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        body.dark .debug-section {
+            background-color: #1f2937;
+        }
+        
+        /* Evidence toggle styles */
+        .evidence-toggle {
+            display: flex;
+            align-items: center;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .evidence-toggle input[type="checkbox"] {
+            margin-right: 0.5rem;
+        }
+        
+        /* Evidence edit button */
+        .evidence-edit-btn {
+            margin-left: 0.5rem;
+            padding: 0.15rem 0.5rem;
+            font-size: 0.7rem;
+            background-color: #f97316;
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+        
+        body.dark .evidence-edit-btn {
+            background-color: #ea580c;
+        }
+        
+        .evidence-edit-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Checklist edit button */
+        .checklist-edit-btn {
+            margin-left: 0.5rem;
+            padding: 0.15rem 0.5rem;
+            font-size: 0.7rem;
+            background-color: #0ea5e9;
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+        
+        body.dark .checklist-edit-btn {
+            background-color: #0284c7;
+        }
+        
+        .checklist-edit-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        body.dark .modal-content {
+            background-color: #2d3748;
+            color: #e0e0e0;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            line-height: 1;
+        }
+
+        /* Checklist styles */
+        .checklist-items {
+            margin-bottom: 1rem;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background-color: #f3f4f6;
+            border-radius: 0.375rem;
+        }
+
+        body.dark .checklist-item {
+            background-color: #374151;
+        }
+
+        .checklist-item input {
+            flex: 1;
+            margin-right: 0.5rem;
+        }
+
+        .checklist-item-display {
+            margin-left: 1rem;
+            padding-left: 0.5rem;
+            border-left: 2px solid #e5e7eb;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        body.dark .checklist-item-display {
+            border-left-color: #4b5563;
+            color: #9ca3af;
+        }
+
+        .task-details-container {
+            border-left: 2px solid #e5e7eb;
+            padding-left: 0.75rem;
+            margin-left: 1.75rem;
+            margin-top: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        body.dark .task-details-container {
+            border-left-color: #4b5563;
+        }
+
+        .task-checklist {
+            margin-bottom: 0.5rem;
+        }
+
+        .task-checklist-item {
+            padding: 0.25rem 0;
+            display: flex;
+            align-items: baseline;
+        }
+
+        .task-checklist-item::before {
+            content: "•";
+            margin-right: 0.5rem;
+            color: #6b7280;
+        }
+
+        body.dark .task-checklist-item::before {
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ServiceNow Case Documentation Helper</h1>
+        <div class="version-tag">Version 1.7</div>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" data-tab="documentation">📝 Documentation</div>
+            <div class="tab" data-tab="manage">⚙️ Manage Categories</div>
+            <div class="tab" data-tab="import">📥 Import Data</div>
+        </div>
+        
+        <div id="documentation-tab-content" class="flex-col">
+            <!-- Configuration Section -->
+            <div class="card">
+                <h2>Load Configuration</h2>
+                <div class="form-group">
+                    <label for="json-file">Select JSON File</label>
+                    <input type="file" id="json-file" accept=".json">
+                    <p class="text-muted">Select the JSON file from your OneDrive folder</p>
+                </div>
+                <div id="last-updated" class="text-muted hidden">
+                    Last updated: <span id="last-updated-time"></span>
+                </div>
+            </div>
+
+            <!-- Search & Navigation Section -->
+            <div class="card">
+                <div class="sub-tab-buttons">
+                    <button class="sub-tab-button active" data-subtab="navigation">Navigation</button>
+                    <button class="sub-tab-button" data-subtab="search">Global Search</button>
+                </div>
+
+                <!-- Navigation Section -->
+                <div id="navigation-section" class="subtab-content">
+                    <h2>Navigation</h2>
+                    <div class="navigation">
+                        <div class="navigation-item">
+                            <label for="group-select">Group</label>
+                            <select id="group-select" class="form-control">
+                                <option value="">Select a Group</option>
+                            </select>
+                        </div>
+                        <div class="navigation-item">
+                            <label for="section-select">Section</label>
+                            <select id="section-select" class="form-control" disabled="">
+                                <option value="">Select a Section</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Global Search Section -->
+                <div id="search-section" class="subtab-content hidden">
+                    <h2>Global Search</h2>
+                    <div class="form-group">
+                        <label for="global-search">Search RCAs across all Groups and Sections</label>
+                        <input type="text" id="global-search" placeholder="Type to search across all groups, sections, categories, and RCAs...">
+                        <p class="text-muted">Search will look for matches in Groups, Sections, Categories, and RCA items</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories and Tasks Side by Side -->
+            <div class="grid grid-cols-2">
+                <!-- Left Panel: Categories or Search Results -->
+                <div class="card">
+                    <div id="categories-panel">
+                        <h2>Categories</h2>
+                        <div class="form-group">
+                            <label for="category-search">Search Categories</label>
+                            <input type="text" id="category-search" placeholder="Type to search categories...">
+                        </div>
+                        <div class="list-container" id="categories-container">
+                            <p class="list-item text-muted">Please select a Group and Section to see categories</p>
+                        </div>
+                    </div>
+
+                    <div id="search-results-panel" class="hidden">
+                        <div class="breadcrumbs">
+                            <span>Location: </span>
+                            <span id="search-breadcrumbs">All Groups &gt; All Sections &gt; All Categories</span>
+                        </div>
+                        <h2>Search Results</h2>
+                        <div class="list-container" id="search-results-container">
+                            <p class="text-muted">Type in the search box to see results</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel: RCAs (Tasks) -->
+                <div class="card">
+                    <div id="no-tasks-message">
+                        <h2>RCA Items</h2>
+                        <p class="list-item text-muted">Select a category to view RCA items</p>
+                    </div>
+                    <div id="tasks-section" class="hidden">
+                        <div class="header-with-actions">
+                            <h2>RCA Items for <span id="selected-category-name">Category</span></h2>
+                            <button id="deselect-all-btn" class="btn-secondary">Deselect All</button>
+                        </div>
+                        <div class="list-container" id="tasks-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Options Section -->
+            <div class="grid grid-cols-2">
+                <div class="card">
+                    <div class="header-with-actions">
+                        <h2>Options</h2>
+                        <button id="clear-all-categories-btn" class="btn-warning">Clear All Categories</button>
+                    </div>
+                    <div class="checkbox-label">
+                        <input type="checkbox" id="fixed-checkbox">
+                        <label for="fixed-checkbox">Issue fixed with the last selected RCA item</label>
+                    </div>
+
+                    <!-- Evidence Attached checkbox removed in v1.6 as the Evidence Required flag now handles this automatically -->
+
+                    <div class="form-group">
+                        <label for="comments">Additional Comments</label>
+                        <textarea id="comments" rows="4" placeholder="Enter any additional comments here..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Documentation Preview -->
+                <div class="card">
+                    <div class="flex justify-between items-center">
+                        <h2>Documentation Preview</h2>
+                        <button id="copy-button" class="btn-primary">
+                            Copy to Clipboard
+                        </button>
+                    </div>
+                    <div class="preview" id="documentation-preview">
+                        <p class="text-muted">Documentation will appear here as you select RCA items</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Manage Categories Tab Content -->
+        <div id="manage-tab-content" class="flex-col hidden">
+            <div class="grid grid-cols-3">
+                <!-- Group Management -->
+                <div class="card">
+                    <h2>Manage Groups</h2>
+                    
+                    <div class="form-group">
+                        <h3>Add New Group</h3>
+                        <div class="form-group">
+                            <label for="new-group-name">Group Name</label>
+                            <input type="text" id="new-group-name" placeholder="Enter group name">
+                        </div>
+                        <button id="add-group-btn" class="btn-primary">
+                            Add Group
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <h3>Existing Groups</h3>
+                        <div class="list-container" id="manage-groups-container">
+                            <p class="list-item text-muted">Please load a JSON file to manage groups</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section Management -->
+                <div class="card hidden" id="section-management">
+                    <h2>Sections for <span id="manage-selected-group">Group</span></h2>
+                    
+                    <div class="form-group">
+                        <h3>Add New Section</h3>
+                        <div class="form-group">
+                            <label for="new-section-name">Section Name</label>
+                            <input type="text" id="new-section-name" placeholder="Enter section name">
+                        </div>
+                        <button id="add-section-btn" class="btn-primary">
+                            Add Section
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="header-with-actions">
+                            <h3>Existing Sections</h3>
+                            <button id="delete-group-btn" class="btn-danger">
+                                Delete Group
+                            </button>
+                        </div>
+                        <div class="list-container" id="manage-sections-container"></div>
+                    </div>
+                </div>
+                
+                <!-- Category Management -->
+                <div class="card hidden" id="category-management">
+                    <h2>Categories for <span id="manage-selected-section">Section</span></h2>
+                    
+                    <div class="form-group">
+                        <h3>Add New Category</h3>
+                        <div class="form-group">
+                            <label for="new-category-name">Category Name</label>
+                            <input type="text" id="new-category-name" placeholder="Enter category name">
+                        </div>
+                        <button id="add-category-btn" class="btn-primary">
+                            Add Category
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="header-with-actions">
+                            <h3>Existing Categories</h3>
+                            <button id="delete-section-btn" class="btn-danger">
+                                Delete Section
+                            </button>
+                        </div>
+                        <div class="list-container" id="manage-categories-container"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- RCA Management -->
+            <div class="card hidden" id="rca-management">
+                <h2>RCA Items for <span id="manage-selected-category">Category</span></h2>
+                
+                <div class="grid grid-cols-2">
+                    <div>
+                        <div class="form-group">
+                            <h3>Add New RCA Item</h3>
+                            <div class="form-group">
+                                <label for="new-rca-name">RCA Description</label>
+                                <input type="text" id="new-rca-name" placeholder="Enter RCA description">
+                            </div>
+                            <div class="form-group">
+                                <label for="new-rca-checklist">Checklist Items (Optional)</label>
+                                <textarea id="new-rca-checklist" rows="3" placeholder="Enter checklist items, one per line"></textarea>
+                                <p class="text-muted">Enter troubleshooting steps, one per line. These will appear as a checklist.</p>
+                            </div>
+                            <div class="evidence-toggle">
+                                <input type="checkbox" id="new-rca-evidence">
+                                <label for="new-rca-evidence">Evidence Required</label>
+                            </div>
+                            <button id="add-rca-btn" class="btn-primary">
+                                Add RCA Item
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="header-with-actions">
+                            <h3>Existing RCA Items</h3>
+                            <button id="delete-category-btn" class="btn-danger">
+                                Delete Category
+                            </button>
+                        </div>
+                        <div class="list-container" id="manage-rca-container"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Save Button -->
+            <div class="flex justify-between items-end">
+                <div class="text-muted">Use the save button to create a JSON file with all your changes.</div>
+                <button id="save-categories-btn" class="btn-success">
+                    Save JSON File
+                </button>
+            </div>
+        </div>
+        
+        <!-- Import Tab Content -->
+        <div id="import-tab-content" class="flex-col hidden">
+            <div class="card">
+                <h2>Import Data from CSV</h2>
+                
+                <div class="alert alert-info">
+                    <p>This feature allows you to import data to update your configuration.</p>
+                    <p>Paste CSV data with the following columns: Group, Section, Component, RCA, Evidence Required (optional), Checklist (optional).</p>
+                    <p>You can copy and paste directly from Excel into the text area below.</p>
+                    <p>For the Evidence Required column, use "Yes", "True", or "1" to indicate evidence is required.</p>
+                    <p>For the Checklist column, separate individual steps with semicolons (;).</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="csv-data">Paste CSV Data</label>
+                    <textarea id="csv-data" class="import-textarea" placeholder="Paste your CSV/Excel data here. Each line should have Group, Section, Component, RCA, Created, Created by, Updated values separated by commas or tabs."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <div class="flex-gap">
+                        <button id="preview-csv-btn" class="btn-secondary">Preview Data</button>
+                        <button id="import-csv-btn" class="btn-primary">Import Data</button>
+                    </div>
+                </div>
+                
+                <div id="import-progress" class="import-progress">
+                    <p>Processing import... Please wait.</p>
+                </div>
+                
+                <div id="preview-container" class="hidden">
+                    <h3>Data Preview</h3>
+                    <div class="preview" id="csv-preview"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checklist Modal -->
+        <div id="checklist-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Edit Checklist</h2>
+                    <button class="modal-close" id="close-checklist-modal">×</button>
+                </div>
+                <div id="checklist-modal-body">
+                    <p>Add checklist items that need to be completed for this RCA.</p>
+                    <div id="checklist-items" class="checklist-items">
+                        <!-- Checklist items will be added here -->
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="new-checklist-item" placeholder="Enter new checklist item">
+                        <button id="add-checklist-item-btn" class="btn-primary">Add Item</button>
+                    </div>
+                    <div class="form-group">
+                        <button id="save-checklist-btn" class="btn-success">Save Checklist</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            Roberto Cisneros © Valores Corporativos Softtek S.A. de C.V. 2025-2026 - Confidential
+        </div>
+    </div>
+
+    <script>
+        // Debug mode flag - set to false to hide debug info
+        const DEBUG = false;
+
+        // Check for dark mode preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.body.classList.add('dark');
+            } else {
+                document.body.classList.remove('dark');
+            }
+        });
+
+        // Variables to store data
+        let appData = {
+            groups: []
+        };
+        
+        // Object to store selected tasks by category path
+        let selectedTasks = {};
+        
+        // Array to track the selection order
+        let selectionOrder = [];
+        
+        // Reference variables for current selections
+        let lastSelectedGroup = null;
+        let lastSelectedSection = null;
+        let lastSelectedCategory = null;
+        let jsonFileName = "servicenow_categories.json"; // Default filename for saving
+        
+        // Management tab selections
+        let selectedGroupForManagement = null;
+        let selectedSectionForManagement = null;
+        let selectedCategoryForManagement = null;
+        
+        // Checklist modal variables
+        let currentChecklistTask = null;
+        let currentChecklistIndex = null;
+        let tempChecklist = [];
+
+        // DOM Elements - Documentation Tab
+        const jsonFileInput = document.getElementById('json-file');
+        const lastUpdatedSection = document.getElementById('last-updated');
+        const lastUpdatedTime = document.getElementById('last-updated-time');
+        
+        // Sub-tabs
+        const subTabButtons = document.querySelectorAll('.sub-tab-button');
+        const navigationSection = document.getElementById('navigation-section');
+        const searchSection = document.getElementById('search-section');
+        
+        // Navigation elements
+        const groupSelect = document.getElementById('group-select');
+        const sectionSelect = document.getElementById('section-select');
+        
+        // Categories panel
+        const categoriesPanel = document.getElementById('categories-panel');
+        const categorySearch = document.getElementById('category-search');
+        const categoriesContainer = document.getElementById('categories-container');
+        
+        // Search results panel
+        const searchResultsPanel = document.getElementById('search-results-panel');
+        const globalSearch = document.getElementById('global-search');
+        const searchResultsContainer = document.getElementById('search-results-container');
+        const searchBreadcrumbs = document.getElementById('search-breadcrumbs');
+        
+        // Tasks section
+        const tasksSection = document.getElementById('tasks-section');
+        const noTasksMessage = document.getElementById('no-tasks-message');
+        const selectedCategoryName = document.getElementById('selected-category-name');
+        const tasksContainer = document.getElementById('tasks-container');
+        const deselectAllBtn = document.getElementById('deselect-all-btn');
+        const clearAllCategoriesBtn = document.getElementById('clear-all-categories-btn');
+        
+        // Options and preview
+        const fixedCheckbox = document.getElementById('fixed-checkbox');
+        const commentsTextarea = document.getElementById('comments');
+        const documentationPreview = document.getElementById('documentation-preview');
+        const copyButton = document.getElementById('copy-button');
+
+        // DOM Elements - Manage Tab
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('[id$="-tab-content"]');
+        const manageGroupsContainer = document.getElementById('manage-groups-container');
+        const manageSectionsContainer = document.getElementById('manage-sections-container');
+        const manageCategoriesContainer = document.getElementById('manage-categories-container');
+        const sectionManagement = document.getElementById('section-management');
+        const categoryManagement = document.getElementById('category-management');
+        const rcaManagement = document.getElementById('rca-management');
+        const manageSelectedGroup = document.getElementById('manage-selected-group');
+        const manageSelectedSection = document.getElementById('manage-selected-section');
+        const manageSelectedCategory = document.getElementById('manage-selected-category');
+        const manageRcaContainer = document.getElementById('manage-rca-container');
+        const newGroupNameInput = document.getElementById('new-group-name');
+        const newSectionNameInput = document.getElementById('new-section-name');
+        const newCategoryNameInput = document.getElementById('new-category-name');
+        const newRcaNameInput = document.getElementById('new-rca-name');
+        const newRcaEvidence = document.getElementById('new-rca-evidence');
+        const newRcaChecklist = document.getElementById('new-rca-checklist');
+        const addGroupBtn = document.getElementById('add-group-btn');
+        const addSectionBtn = document.getElementById('add-section-btn');
+        const addCategoryBtn = document.getElementById('add-category-btn');
+        const addRcaBtn = document.getElementById('add-rca-btn');
+        const deleteGroupBtn = document.getElementById('delete-group-btn');
+        const deleteSectionBtn = document.getElementById('delete-section-btn');
+        const deleteCategoryBtn = document.getElementById('delete-category-btn');
+        const saveCategoriesBtn = document.getElementById('save-categories-btn');
+
+        // DOM Elements - Import Tab
+        const csvDataTextarea = document.getElementById('csv-data');
+        const previewCsvBtn = document.getElementById('preview-csv-btn');
+        const importCsvBtn = document.getElementById('import-csv-btn');
+        const importProgress = document.getElementById('import-progress');
+        const previewContainer = document.getElementById('preview-container');
+        const csvPreview = document.getElementById('csv-preview');
+        
+        // DOM Elements - Checklist Modal
+        const checklistModal = document.getElementById('checklist-modal');
+        const closeChecklistModal = document.getElementById('close-checklist-modal');
+        const checklistItemsContainer = document.getElementById('checklist-items');
+        const newChecklistItem = document.getElementById('new-checklist-item');
+        const addChecklistItemBtn = document.getElementById('add-checklist-item-btn');
+        const saveChecklistBtn = document.getElementById('save-checklist-btn');
+
+        // Event Listeners - Documentation Tab
+        jsonFileInput.addEventListener('change', handleFileSelect);
+        groupSelect.addEventListener('change', handleGroupChange);
+        sectionSelect.addEventListener('change', handleSectionChange);
+        categorySearch.addEventListener('input', filterCategories);
+        globalSearch.addEventListener('input', handleGlobalSearch);
+        deselectAllBtn.addEventListener('click', deselectAllTasks);
+        clearAllCategoriesBtn.addEventListener('click', clearAllCategories);
+        fixedCheckbox.addEventListener('change', updateDocumentation);
+        commentsTextarea.addEventListener('input', updateDocumentation);
+        copyButton.addEventListener('click', copyToClipboard);
+
+        // Event Listeners - Sub Tabs
+        subTabButtons.forEach(button => {
+            button.addEventListener('click', () => switchSubTab(button.dataset.subtab));
+        });
+
+        // Event Listeners - Manage Tab
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+        });
+        
+        addGroupBtn.addEventListener('click', addNewGroup);
+        addSectionBtn.addEventListener('click', addNewSection);
+        addCategoryBtn.addEventListener('click', addNewCategory);
+        addRcaBtn.addEventListener('click', addNewRca);
+        deleteGroupBtn.addEventListener('click', deleteSelectedGroup);
+        deleteSectionBtn.addEventListener('click', deleteSelectedSection);
+        deleteCategoryBtn.addEventListener('click', deleteSelectedCategory);
+        saveCategoriesBtn.addEventListener('click', saveJsonFile);
+
+        // Event Listeners - Import Tab
+        previewCsvBtn.addEventListener('click', previewCsvData);
+        importCsvBtn.addEventListener('click', importCsvData);
+        
+        // Event Listeners - Checklist Modal
+        closeChecklistModal.addEventListener('click', closeModal);
+        addChecklistItemBtn.addEventListener('click', addChecklistItem);
+        saveChecklistBtn.addEventListener('click', saveChecklist);
+        newChecklistItem.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addChecklistItem();
+            }
+        });
+
+        // Tab switching function
+        function switchTab(tabId) {
+            // Hide all tab content
+            tabContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Remove active class from all tabs
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content and mark tab as active
+            document.getElementById(`${tabId}-tab-content`).classList.remove('hidden');
+            document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
+            
+            // Update displays based on the selected tab
+            if (tabId === 'manage' && appData.groups.length > 0) {
+                displayManageGroups();
+            }
+        }
+
+        // Switch between navigation and search sub-tabs
+        function switchSubTab(subtabId) {
+            // Update button active state
+            subTabButtons.forEach(button => {
+                if (button.dataset.subtab === subtabId) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+            
+            // Show/hide appropriate sections
+            if (subtabId === 'navigation') {
+                navigationSection.classList.remove('hidden');
+                searchSection.classList.add('hidden');
+                categoriesPanel.classList.remove('hidden');
+                searchResultsPanel.classList.add('hidden');
+            } else if (subtabId === 'search') {
+                navigationSection.classList.add('hidden');
+                searchSection.classList.remove('hidden');
+                categoriesPanel.classList.add('hidden');
+                searchResultsPanel.classList.remove('hidden');
+            }
+        }
+
+        // Function to handle JSON file selection
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Save the filename for later use when saving
+            jsonFileName = file.name;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (Array.isArray(data.groups)) {
+                        appData.groups = data.groups;
+                        
+                        // Populate group dropdown
+                        populateGroupDropdown();
+                        
+                        // Display groups in management tab
+                        displayManageGroups();
+                        
+                        // Show last updated time
+                        const now = new Date();
+                        lastUpdatedTime.textContent = now.toLocaleString();
+                        lastUpdatedSection.classList.remove('hidden');
+                        
+                        // Clear any previous selections
+                        selectedTasks = {};
+                        selectionOrder = [];
+                        lastSelectedGroup = null;
+                        lastSelectedSection = null;
+                        lastSelectedCategory = null;
+                        updateDocumentation();
+                    } else {
+                        alert('Invalid JSON format. Expected an object with a "groups" array.');
+                    }
+                } catch (error) {
+                    alert('Error parsing JSON file: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Function to populate group dropdown
+        function populateGroupDropdown() {
+            // Clear existing options except the first one
+            while (groupSelect.options.length > 1) {
+                groupSelect.remove(1);
+            }
+            
+            // Add new options
+            appData.groups.forEach(group => {
+                const option = document.createElement('option');
+                option.value = group.name;
+                option.textContent = group.name;
+                groupSelect.appendChild(option);
+            });
+            
+            // Enable the select
+            groupSelect.disabled = false;
+            
+            // Disable section select until a group is selected
+            sectionSelect.disabled = true;
+            sectionSelect.value = "";
+            
+            // Clear categories
+            categoriesContainer.innerHTML = '<p class="list-item text-muted">Please select a Group and Section to see categories</p>';
+        }
+
+        // Function to handle group selection change
+        function handleGroupChange() {
+            const groupName = groupSelect.value;
+            
+            // Clear section dropdown except the first option
+            while (sectionSelect.options.length > 1) {
+                sectionSelect.remove(1);
+            }
+            
+            if (!groupName) {
+                sectionSelect.disabled = true;
+                categoriesContainer.innerHTML = '<p class="list-item text-muted">Please select a Group and Section to see categories</p>';
+                return;
+            }
+            
+            // Find the selected group
+            const group = appData.groups.find(g => g.name === groupName);
+            if (!group) {
+                sectionSelect.disabled = true;
+                return;
+            }
+            
+            lastSelectedGroup = group;
+            
+            // Populate section dropdown
+            if (group.sections && group.sections.length > 0) {
+                group.sections.forEach(section => {
+                    const option = document.createElement('option');
+                    option.value = section.name;
+                    option.textContent = section.name;
+                    sectionSelect.appendChild(option);
+                });
+                sectionSelect.disabled = false;
+            } else {
+                sectionSelect.disabled = true;
+                categoriesContainer.innerHTML = '<p class="list-item text-muted">No sections found for this group</p>';
+            }
+        }
+
+        // Function to handle section selection change
+        function handleSectionChange() {
+            const sectionName = sectionSelect.value;
+            
+            if (!lastSelectedGroup || !sectionName) {
+                categoriesContainer.innerHTML = '<p class="list-item text-muted">Please select a Group and Section to see categories</p>';
+                return;
+            }
+            
+            // Find the selected section
+            const section = lastSelectedGroup.sections.find(s => s.name === sectionName);
+            if (!section) return;
+            
+            lastSelectedSection = section;
+            
+            // Display categories
+            displayCategories(section.categories || []);
+        }
+
+        // Function to display categories in documentation tab
+        function displayCategories(categories) {
+            if (!categories.length) {
+                categoriesContainer.innerHTML = '<p class="list-item text-muted">No categories found in this section</p>';
+                return;
+            }
+
+            categoriesContainer.innerHTML = '';
+            categories.forEach((category, index) => {
+                const categoryElement = document.createElement('div');
+                categoryElement.className = 'list-item';
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = category.name;
+                
+                // Create task counter
+                const counter = document.createElement('span');
+                counter.className = 'task-counter';
+                counter.textContent = getTaskCounterText(category);
+                updateCounterStyle(counter, category);
+                
+                categoryElement.appendChild(nameSpan);
+                categoryElement.appendChild(counter);
+                
+                // Store category data in the element
+                categoryElement.dataset.categoryIndex = index;
+                categoryElement.addEventListener('click', () => selectCategory(category));
+                categoriesContainer.appendChild(categoryElement);
+            });
+        }
+
+        // Function to handle global search across all groups, sections, and categories
+        function handleGlobalSearch() {
+            const searchTerm = globalSearch.value.trim().toLowerCase();
+            
+            if (!searchTerm) {
+                searchResultsContainer.innerHTML = '<p class="text-muted">Type in the search box to see results</p>';
+                return;
+            }
+            
+            // Search across all groups, sections, categories, and tasks
+            const results = [];
+            
+            appData.groups.forEach(group => {
+                if (!group.sections) return;
+                
+                group.sections.forEach(section => {
+                    if (!section.categories) return;
+                    
+                    section.categories.forEach(category => {
+                        // Check if category name matches search
+                        const categoryMatches = category.name.toLowerCase().includes(searchTerm);
+                        
+                        // Check if any tasks match search
+                        const matchingTasks = [];
+                        if (category.tasks && category.tasks.length > 0) {
+                            category.tasks.forEach(task => {
+                                let taskText = typeof task === 'string' ? task : task.text;
+                                if (taskText.toLowerCase().includes(searchTerm)) {
+                                    matchingTasks.push(task);
+                                }
+                            });
+                        }
+                        
+                        // If category or tasks match, add to results
+                        if (categoryMatches || matchingTasks.length > 0) {
+                            results.push({
+                                group: group.name,
+                                section: section.name,
+                                category: category,
+                                matchingTasks: matchingTasks,
+                                categoryMatches: categoryMatches,
+                                path: `${group.name}/${section.name}/${category.name}`
+                            });
+                        }
+                    });
+                });
+            });
+            
+            // Display search results
+            if (results.length === 0) {
+                searchResultsContainer.innerHTML = '<p class="text-muted">No matching results found</p>';
+                return;
+            }
+            
+            searchResultsContainer.innerHTML = '';
+            results.forEach(result => {
+                const resultElement = document.createElement('div');
+                resultElement.className = 'search-result-item';
+                
+                const pathElement = document.createElement('div');
+                pathElement.className = 'search-result-path';
+                pathElement.textContent = `${result.group} > ${result.section}`;
+                resultElement.appendChild(pathElement);
+                
+                const titleElement = document.createElement('div');
+                titleElement.className = 'search-result-title';
+                titleElement.textContent = result.category.name;
+                resultElement.appendChild(titleElement);
+                
+                // Create a container for the task list
+                const taskListElement = document.createElement('div');
+                taskListElement.className = 'search-task-list';
+                
+                // If there are matching tasks, show them
+                if (result.matchingTasks.length > 0) {
+                    result.matchingTasks.forEach(task => {
+                        const taskElement = document.createElement('span');
+                        taskElement.className = 'search-result-task';
+                        // Check if this task is already selected
+                        const isSelected = isTaskSelected(result.path, task);
+                        if (isSelected) {
+                            taskElement.classList.add('selected');
+                        }
+                        
+                        // Get task text
+                        const taskText = typeof task === 'string' ? task : task.text;
+                        taskElement.textContent = taskText;
+                        
+                        // Add click handler for task
+                        taskElement.addEventListener('click', (e) => {
+                            e.stopPropagation(); // Prevent the category click handler from firing
+                            toggleTaskFromSearch(result, task, taskElement);
+                        });
+                        
+                        taskListElement.appendChild(taskElement);
+                    });
+                } 
+                // If no tasks matched but the category did, show all tasks
+                else if (result.categoryMatches && result.category.tasks) {
+                    result.category.tasks.forEach(task => {
+                        const taskElement = document.createElement('span');
+                        taskElement.className = 'search-result-task';
+                        // Check if this task is already selected
+                        const isSelected = isTaskSelected(result.path, task);
+                        if (isSelected) {
+                            taskElement.classList.add('selected');
+                        }
+                        
+                        // Get task text
+                        const taskText = typeof task === 'string' ? task : task.text;
+                        taskElement.textContent = taskText;
+                        
+                        // Add click handler for task
+                        taskElement.addEventListener('click', (e) => {
+                            e.stopPropagation(); // Prevent the category click handler from firing
+                            toggleTaskFromSearch(result, task, taskElement);
+                        });
+                        
+                        taskListElement.appendChild(taskElement);
+                    });
+                }
+                
+                resultElement.appendChild(taskListElement);
+                
+                // Add click handler to navigate to this category
+                resultElement.addEventListener('click', () => navigateToSearchResult(result));
+                
+                searchResultsContainer.appendChild(resultElement);
+            });
+            
+            // Update breadcrumbs
+            searchBreadcrumbs.textContent = 'Search Results';
+        }
+
+        // Function to check if a task is selected
+        function isTaskSelected(categoryPath, task) {
+            if (!selectedTasks[categoryPath]) return false;
+            
+            // Handle both string tasks and object tasks
+            return selectedTasks[categoryPath].some(selectedTask => {
+                if (typeof selectedTask === 'string' && typeof task === 'string') {
+                    return selectedTask === task;
+                } else if (typeof selectedTask === 'object' && selectedTask !== null) {
+                    return typeof task === 'string' ? 
+                        selectedTask.text === task : 
+                        selectedTask.text === task.text;
+                }
+                return false;
+            });
+        }
+
+        // Function to toggle a task from search results
+        function toggleTaskFromSearch(result, task, taskElement) {
+            // Get the full category path
+            const categoryPath = result.path;
+            
+            // Check if task is already selected
+            const isSelected = isTaskSelected(categoryPath, task);
+            
+            if (isSelected) {
+                // Remove task from selected tasks
+                if (selectedTasks[categoryPath]) {
+                    selectedTasks[categoryPath] = selectedTasks[categoryPath].filter(t => {
+                        if (typeof t === 'string' && typeof task === 'string') {
+                            return t !== task;
+                        } else if (typeof t === 'object' && typeof task === 'object') {
+                            return t.text !== task.text;
+                        } else if (typeof t === 'object' && typeof task === 'string') {
+                            return t.text !== task;
+                        } else if (typeof t === 'string' && typeof task === 'object') {
+                            return t !== task.text;
+                        }
+                        return true;
+                    });
+                    
+                    // If the array is empty, delete the category key
+                    if (selectedTasks[categoryPath].length === 0) {
+                        delete selectedTasks[categoryPath];
+                    }
+                }
+                
+                // Remove from selection order
+                selectionOrder = selectionOrder.filter(item => {
+                    const itemTask = typeof item.task === 'string' ? item.task : item.task.text;
+                    const currentTask = typeof task === 'string' ? task : task.text;
+                    return !(item.path === categoryPath && itemTask === currentTask);
+                });
+                
+                // Update the UI to reflect deselection
+                taskElement.classList.remove('selected');
+            } else {
+                // Add task to selected tasks
+                if (!selectedTasks[categoryPath]) {
+                    selectedTasks[categoryPath] = [];
+                }
+                selectedTasks[categoryPath].push(task);
+                
+                // Add to selection order
+                selectionOrder.push({
+                    path: categoryPath,
+                    task: task,
+                    group: result.group,
+                    section: result.section,
+                    category: result.category.name
+                });
+                
+                // Update the UI to reflect selection
+                taskElement.classList.add('selected');
+            }
+            
+            // Debug logging
+            if (DEBUG) {
+                console.log('Selected Tasks:', JSON.stringify(selectedTasks, null, 2));
+                console.log('Selection Order:', selectionOrder);
+            }
+            
+            // Update the documentation preview
+            updateAllCounters();
+            updateDocumentation();
+        }
+
+        // Function to navigate to a search result
+        function navigateToSearchResult(result) {
+            // Switch back to navigation tab
+            switchSubTab('navigation');
+            
+            // Set the group dropdown
+            groupSelect.value = result.group;
+            handleGroupChange(); // Trigger the change event to update sections
+            
+            // Set the section dropdown
+            sectionSelect.value = result.section;
+            handleSectionChange(); // Trigger the change event to update categories
+            
+            // Find and click the category
+            const categoryElements = categoriesContainer.querySelectorAll('.list-item');
+            categoryElements.forEach(element => {
+                const categoryName = element.querySelector('span').textContent;
+                if (categoryName === result.category.name) {
+                    element.click();
+                }
+            });
+        }
+
+        // Helper to get counter text
+        function getTaskCounterText(category) {
+            const totalTasks = category.tasks ? category.tasks.length : 0;
+            const categoryPath = getCategoryPath(lastSelectedGroup, lastSelectedSection, category);
+            const selectedCount = selectedTasks[categoryPath] ? selectedTasks[categoryPath].length : 0;
+            return `${selectedCount}/${totalTasks}`;
+        }
+        
+        // Helper to get full category path consistently
+        function getCategoryPath(group, section, category) {
+            if (!group || !section || !category) return null;
+            return `${group.name}/${section.name}/${category.name}`;
+        }
+        
+        // Helper to update counter style
+        function updateCounterStyle(counterElement, category) {
+            const totalTasks = category.tasks ? category.tasks.length : 0;
+            const categoryPath = getCategoryPath(lastSelectedGroup, lastSelectedSection, category);
+            const selectedCount = selectedTasks[categoryPath] ? selectedTasks[categoryPath].length : 0;
+            
+            // If there are no tasks, don't show as complete
+            if (totalTasks === 0) {
+                counterElement.classList.remove('complete');
+                return;
+            }
+            
+            if (selectedCount === totalTasks) {
+                counterElement.classList.add('complete');
+            } else {
+                counterElement.classList.remove('complete');
+            }
+        }
+
+        // Function to update all category counters
+        function updateAllCounters() {
+            const categoryElements = categoriesContainer.querySelectorAll('.list-item');
+            categoryElements.forEach(element => {
+                const index = element.dataset.categoryIndex;
+                if (index !== undefined && lastSelectedSection && lastSelectedSection.categories) {
+                    const category = lastSelectedSection.categories[index];
+                    const counter = element.querySelector('.task-counter');
+                    if (counter && category) {
+                        counter.textContent = getTaskCounterText(category);
+                        updateCounterStyle(counter, category);
+                    }
+                }
+            });
+        }
+
+        // Function to filter categories in documentation tab
+        function filterCategories() {
+            const searchTerm = categorySearch.value.toLowerCase();
+            
+            if (!lastSelectedSection || !lastSelectedSection.categories) {
+                return;
+            }
+            
+            const categories = lastSelectedSection.categories;
+            
+            if (!searchTerm) {
+                // If search is empty, show all categories
+                displayCategories(categories);
+                return;
+            }
+            
+            // Filter categories by name
+            const filteredCategories = categories.filter(category => 
+                category.name.toLowerCase().includes(searchTerm)
+            );
+            
+            if (filteredCategories.length === 0) {
+                categoriesContainer.innerHTML = '<p class="list-item text-muted">No matching categories found</p>';
+                return;
+            }
+            
+            displayCategories(filteredCategories);
+        }
+
+        // Function to select a category and display its tasks in documentation tab
+        function selectCategory(category) {
+            if (!category) return;
+
+            lastSelectedCategory = category;
+            selectedCategoryName.textContent = category.name;
+            
+            // Always clear the previous tasks container content
+            tasksContainer.innerHTML = '';
+            
+            // Hide the no-tasks message and show the tasks section
+            noTasksMessage.style.display = 'none';
+            tasksSection.classList.remove('hidden');
+            
+            if (!category.tasks || !category.tasks.length) {
+                // Show empty container with message for categories with no tasks
+                tasksContainer.innerHTML = '<div class="empty-container"><p class="text-muted">No RCA items available for this category</p></div>';
+                return;
+            }
+
+            // Get the full category path for the selected tasks
+            const categoryPath = getCategoryPath(lastSelectedGroup, lastSelectedSection, category);
+
+            category.tasks.forEach((taskItem, taskIndex) => {
+                const taskElement = document.createElement('div');
+                taskElement.className = 'task-item';
+                
+                // Handle both string and object tasks
+                const taskText = typeof taskItem === 'string' ? taskItem : taskItem.text;
+                const evidenceRequired = typeof taskItem === 'object' && taskItem.evidenceRequired;
+                const hasChecklist = typeof taskItem === 'object' && taskItem.checklist && taskItem.checklist.length > 0;
+                
+                const uniqueId = `task-${categoryPath.replace(/[\/\s]+/g, '-')}-${taskIndex}`;
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'task-checkbox';
+                checkbox.id = uniqueId;
+                checkbox.checked = isTaskSelected(categoryPath, taskItem);
+                checkbox.addEventListener('change', () => {
+                    if (checkbox.checked) {
+                        // Add task to selected tasks
+                        if (!selectedTasks[categoryPath]) {
+                            selectedTasks[categoryPath] = [];
+                        }
+                        
+                        // Only add if not already in the array
+                        const isAlreadySelected = selectedTasks[categoryPath].some(t => 
+                            (typeof t === 'string' && t === taskText) || 
+                            (typeof t === 'object' && t.text === taskText)
+                        );
+                        
+                        if (!isAlreadySelected) {
+                            // Preserve task object structure if it exists
+                            selectedTasks[categoryPath].push(taskItem);
+                            
+                            // Add to selection order
+                            selectionOrder.push({
+                                path: categoryPath,
+                                task: taskItem,
+                                group: lastSelectedGroup.name,
+                                section: lastSelectedSection.name,
+                                category: category.name
+                            });
+                        }
+                    } else {
+                        // Remove task from selected tasks
+                        if (selectedTasks[categoryPath]) {
+                            selectedTasks[categoryPath] = selectedTasks[categoryPath].filter(t => {
+                                if (typeof t === 'string' && typeof taskItem === 'string') {
+                                    return t !== taskItem;
+                                } else if (typeof t === 'object' && t.text) {
+                                    return typeof taskItem === 'string' ? 
+                                        t.text !== taskItem : 
+                                        t.text !== taskItem.text;
+                                }
+                                return true;
+                            });
+                            
+                            // If the array is empty, delete the category key
+                            if (selectedTasks[categoryPath].length === 0) {
+                                delete selectedTasks[categoryPath];
+                            }
+                            
+                            // Remove from selection order
+                            selectionOrder = selectionOrder.filter(item => {
+                                const itemTask = typeof item.task === 'string' ? item.task : item.task.text;
+                                const currentTask = typeof taskItem === 'string' ? taskItem : taskItem.text;
+                                return !(item.path === categoryPath && itemTask === currentTask);
+                            });
+                        }
+                    }
+                    
+                    // Debug logging
+                    if (DEBUG) {
+                        console.log('Category Path:', categoryPath);
+                        console.log('Selected Tasks:', JSON.stringify(selectedTasks, null, 2));
+                        console.log('Selection Order:', selectionOrder);
+                    }
+                    
+                    // Update counters and documentation
+                    updateAllCounters();
+                    updateDocumentation();
+                });
+                
+                const label = document.createElement('div');
+                label.className = 'task-label';
+                
+                const labelText = document.createElement('label');
+                labelText.textContent = taskText;
+                labelText.setAttribute('for', uniqueId);
+                label.appendChild(labelText);
+                
+                // Add tags container for evidence and checklist indicators
+                const tagsContainer = document.createElement('span');
+                
+                // Add evidence required tag if needed
+                if (evidenceRequired) {
+                    const evidenceTag = document.createElement('span');
+                    evidenceTag.className = 'evidence-required';
+                    evidenceTag.textContent = 'Evidence Required';
+                    tagsContainer.appendChild(evidenceTag);
+                }
+                
+                // Add checklist tag if needed
+                if (hasChecklist) {
+                    const checklistTag = document.createElement('span');
+                    checklistTag.className = 'checklist-tag';
+                    checklistTag.textContent = 'Checklist';
+                    tagsContainer.appendChild(checklistTag);
+                }
+                
+                if (tagsContainer.children.length > 0) {
+                    label.appendChild(tagsContainer);
+                }
+                
+                // Add checklist items display if task has a checklist
+                if (hasChecklist) {
+                    const checklistContainer = document.createElement('div');
+                    checklistContainer.className = 'task-details-container';
+                    
+                    const checklistHeader = document.createElement('div');
+                    checklistHeader.className = 'task-checklist-header';
+                    checklistHeader.textContent = 'Checklist:';
+                    checklistContainer.appendChild(checklistHeader);
+                    
+                    const checklistItems = document.createElement('div');
+                    checklistItems.className = 'task-checklist';
+                    
+                    taskItem.checklist.forEach(item => {
+                        const checklistItem = document.createElement('div');
+                        checklistItem.className = 'task-checklist-item';
+                        checklistItem.textContent = item;
+                        checklistItems.appendChild(checklistItem);
+                    });
+                    
+                    checklistContainer.appendChild(checklistItems);
+                    label.appendChild(checklistContainer);
+                }
+                
+                taskElement.appendChild(checkbox);
+                taskElement.appendChild(label);
+                tasksContainer.appendChild(taskElement);
+            });
+        }
+
+        // Function to deselect all tasks for the current category
+        function deselectAllTasks() {
+            if (!lastSelectedCategory) return;
+            
+            // Get the full category path
+            const categoryPath = getCategoryPath(lastSelectedGroup, lastSelectedSection, lastSelectedCategory);
+            
+            if (!categoryPath) return;
+            
+            // Get all tasks for this category that are currently selected
+            const tasksToRemove = selectedTasks[categoryPath] || [];
+            
+            // Remove all tasks for the current category from selectedTasks
+            if (selectedTasks[categoryPath]) {
+                delete selectedTasks[categoryPath];
+            }
+            
+            // Remove these tasks from the selection order
+            selectionOrder = selectionOrder.filter(item => item.path !== categoryPath);
+            
+            // Uncheck all checkboxes
+            const checkboxes = tasksContainer.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Update counters and documentation
+            updateAllCounters();
+            updateDocumentation();
+            
+            // Show feedback
+            showFeedback(deselectAllBtn, "Cleared!");
+        }
+
+        // Function to clear all categories
+        function clearAllCategories() {
+            if (Object.keys(selectedTasks).length === 0) {
+                alert('No RCA items are currently selected.');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to clear all selected RCA items across all categories?')) {
+                // Clear all selected tasks
+                selectedTasks = {};
+                selectionOrder = [];
+                
+                // Uncheck any visible checkboxes in the current category
+                if (lastSelectedCategory) {
+                    const checkboxes = tasksContainer.querySelectorAll('input[type="checkbox"]');
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+                }
+                
+                // Update UI for search results if visible
+                const searchTasks = document.querySelectorAll('.search-result-task');
+                searchTasks.forEach(taskElement => {
+                    taskElement.classList.remove('selected');
+                });
+                
+                // Update counters and documentation
+                updateAllCounters();
+                updateDocumentation();
+                
+                // Show feedback
+                showFeedback(clearAllCategoriesBtn, "All Cleared!");
+            }
+        }
+
+        // Function to display groups in management tab
+        function displayManageGroups() {
+            if (!appData.groups || !appData.groups.length) {
+                manageGroupsContainer.innerHTML = '<p class="list-item text-muted">No groups found</p>';
+                return;
+            }
+
+            manageGroupsContainer.innerHTML = '';
+            appData.groups.forEach((group, index) => {
+                const groupElement = document.createElement('div');
+                groupElement.className = 'list-item';
+                groupElement.textContent = group.name;
+                groupElement.dataset.index = index;
+                groupElement.addEventListener('click', () => selectGroupForManagement(group, index));
+                manageGroupsContainer.appendChild(groupElement);
+            });
+            
+            // Hide section and category management until a group is selected
+            sectionManagement.classList.add('hidden');
+            categoryManagement.classList.add('hidden');
+            rcaManagement.classList.add('hidden');
+        }
+
+        // Function to select a group for management
+        function selectGroupForManagement(group, index) {
+            selectedGroupForManagement = group;
+            manageSelectedGroup.textContent = group.name;
+            
+            // Show section management
+            sectionManagement.classList.remove('hidden');
+            
+            // Hide category management until a section is selected
+            categoryManagement.classList.add('hidden');
+            rcaManagement.classList.add('hidden');
+            
+            // Display sections
+            displayManageSections();
+        }
+
+        // Function to display sections in management tab
+        function displayManageSections() {
+            if (!selectedGroupForManagement || !selectedGroupForManagement.sections || !selectedGroupForManagement.sections.length) {
+                manageSectionsContainer.innerHTML = '<p class="list-item text-muted">No sections found</p>';
+                return;
+            }
+
+            manageSectionsContainer.innerHTML = '';
+            selectedGroupForManagement.sections.forEach((section, index) => {
+                const sectionElement = document.createElement('div');
+                sectionElement.className = 'list-item';
+                sectionElement.textContent = section.name;
+                sectionElement.dataset.index = index;
+                sectionElement.addEventListener('click', () => selectSectionForManagement(section, index));
+                manageSectionsContainer.appendChild(sectionElement);
+            });
+        }
+
+        // Function to select a section for management
+        function selectSectionForManagement(section, index) {
+            selectedSectionForManagement = section;
+            manageSelectedSection.textContent = section.name;
+            
+            // Show category management
+            categoryManagement.classList.remove('hidden');
+            
+            // Hide RCA management until a category is selected
+            rcaManagement.classList.add('hidden');
+            
+            // Display categories
+            displayManageCategories();
+        }
+
+        // Function to display categories in management tab
+        function displayManageCategories() {
+            if (!selectedSectionForManagement || !selectedSectionForManagement.categories || !selectedSectionForManagement.categories.length) {
+                manageCategoriesContainer.innerHTML = '<p class="list-item text-muted">No categories found</p>';
+                return;
+            }
+
+            manageCategoriesContainer.innerHTML = '';
+            selectedSectionForManagement.categories.forEach((category, index) => {
+                const categoryElement = document.createElement('div');
+                categoryElement.className = 'list-item';
+                categoryElement.textContent = category.name;
+                categoryElement.dataset.index = index;
+                categoryElement.addEventListener('click', () => selectCategoryForManagement(category, index));
+                manageCategoriesContainer.appendChild(categoryElement);
+            });
+        }
+
+        // Function to select a category for management
+        function selectCategoryForManagement(category, index) {
+            selectedCategoryForManagement = category;
+            manageSelectedCategory.textContent = category.name;
+            
+            // Show RCA management
+            rcaManagement.classList.remove('hidden');
+            
+            // Display RCA items
+            displayManageRcaItems();
+        }
+
+        // Function to display RCA items in management tab
+        function displayManageRcaItems() {
+            if (!selectedCategoryForManagement || !selectedCategoryForManagement.tasks || !selectedCategoryForManagement.tasks.length) {
+                manageRcaContainer.innerHTML = '<p class="list-item text-muted">No RCA items found</p>';
+                return;
+            }
+
+            manageRcaContainer.innerHTML = '';
+            selectedCategoryForManagement.tasks.forEach((task, index) => {
+                const taskElement = document.createElement('div');
+                taskElement.className = 'task-item';
+                
+                const taskText = document.createElement('div');
+                taskText.className = 'task-label';
+                
+                const isEvidenceRequired = typeof task === 'object' && task.evidenceRequired;
+                const hasChecklist = typeof task === 'object' && task.checklist && task.checklist.length > 0;
+                const taskContent = typeof task === 'string' ? task : task.text;
+                
+                taskText.textContent = taskContent;
+                
+                const tagsContainer = document.createElement('div');
+                tagsContainer.style.display = 'flex';
+                tagsContainer.style.gap = '0.25rem';
+                
+                // Add evidence required tag if needed
+                if (isEvidenceRequired) {
+                    const evidenceTag = document.createElement('span');
+                    evidenceTag.className = 'evidence-required';
+                    evidenceTag.textContent = 'Evidence Required';
+                    taskText.appendChild(evidenceTag);
+                }
+                
+                // Add checklist tag if needed
+                if (hasChecklist) {
+                    const checklistTag = document.createElement('span');
+                    checklistTag.className = 'checklist-tag';
+                    checklistTag.textContent = `Checklist (${task.checklist.length})`;
+                    taskText.appendChild(checklistTag);
+                }
+                
+                // Add checklist button
+                const checklistBtn = document.createElement('button');
+                checklistBtn.className = 'checklist-edit-btn';
+                checklistBtn.textContent = hasChecklist ? 'Edit Checklist' : 'Add Checklist';
+                checklistBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    editChecklist(task, index);
+                });
+                
+                // Add toggle button for evidence required
+                const toggleBtn = document.createElement('button');
+                toggleBtn.className = 'evidence-edit-btn';
+                toggleBtn.textContent = isEvidenceRequired ? 'Remove Evidence Flag' : 'Add Evidence Flag';
+                toggleBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleEvidenceRequired(index);
+                });
+                
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-btn';
+                deleteButton.innerHTML = '❌';
+                deleteButton.title = 'Delete RCA item';
+                deleteButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteRcaItem(index);
+                });
+                
+                taskElement.appendChild(taskText);
+                taskElement.appendChild(checklistBtn);
+                taskElement.appendChild(toggleBtn);
+                taskElement.appendChild(deleteButton);
+                manageRcaContainer.appendChild(taskElement);
+            });
+        }
+        
+        // Function to toggle evidence required flag
+        function toggleEvidenceRequired(index) {
+            if (!selectedCategoryForManagement || !selectedCategoryForManagement.tasks) return;
+            
+            const task = selectedCategoryForManagement.tasks[index];
+            
+            if (typeof task === 'string') {
+                // Convert string to object with evidence required flag
+                selectedCategoryForManagement.tasks[index] = {
+                    text: task,
+                    evidenceRequired: true
+                };
+            } else if (typeof task === 'object') {
+                // Toggle the flag
+                if (task.evidenceRequired) {
+                    // If removing the flag and no other properties except text and empty checklist
+                    if (!task.checklist || task.checklist.length === 0) {
+                        selectedCategoryForManagement.tasks[index] = task.text;
+                    } else {
+                        // Keep the object structure but remove the evidence flag
+                        task.evidenceRequired = false;
+                    }
+                } else {
+                    // Add the flag
+                    task.evidenceRequired = true;
+                }
+            }
+            
+            // Update displays
+            displayManageRcaItems();
+            
+            // If this category is currently displayed in the main view, update it
+            if (lastSelectedCategory && lastSelectedCategory.name === selectedCategoryForManagement.name) {
+                selectCategory(lastSelectedCategory);
+            }
+            
+            // Update the category counters and documentation
+            updateAllCounters();
+            updateDocumentation();
+        }
+
+        // Function to get the last selected RCA item
+        function getLastSelectedRca() {
+            if (selectionOrder.length === 0) return null;
+            return selectionOrder[selectionOrder.length - 1];
+        }
+
+        // Function to open the checklist modal for a task
+        function editChecklist(task, index) {
+            // Set the current task and index for global reference
+            currentChecklistTask = task;
+            currentChecklistIndex = index;
+            
+            // Initialize temp checklist
+            tempChecklist = [];
+            
+            // If the task is a string, convert to object
+            if (typeof task === 'string') {
+                currentChecklistTask = {
+                    text: task,
+                    checklist: []
+                };
+            } else if (task.checklist) {
+                // Copy existing checklist items
+                tempChecklist = [...task.checklist];
+            }
+            
+            // Update modal with current checklist items
+            refreshChecklistItems();
+            
+            // Show the modal
+            checklistModal.style.display = 'flex';
+        }
+        
+        // Function to refresh the checklist items in the modal
+        function refreshChecklistItems() {
+            checklistItemsContainer.innerHTML = '';
+            
+            if (tempChecklist.length === 0) {
+                const emptyMessage = document.createElement('p');
+                emptyMessage.className = 'text-muted';
+                emptyMessage.textContent = 'No checklist items added yet.';
+                checklistItemsContainer.appendChild(emptyMessage);
+                return;
+            }
+            
+            tempChecklist.forEach((item, index) => {
+                const itemContainer = document.createElement('div');
+                itemContainer.className = 'checklist-item';
+                
+                const itemInput = document.createElement('input');
+                itemInput.type = 'text';
+                itemInput.value = item;
+                itemInput.addEventListener('change', (e) => {
+                    tempChecklist[index] = e.target.value;
+                });
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.innerHTML = '❌';
+                deleteBtn.addEventListener('click', () => {
+                    tempChecklist.splice(index, 1);
+                    refreshChecklistItems();
+                });
+                
+                itemContainer.appendChild(itemInput);
+                itemContainer.appendChild(deleteBtn);
+                checklistItemsContainer.appendChild(itemContainer);
+            });
+        }
+        
+        // Function to add a new checklist item
+        function addChecklistItem() {
+            const newItem = newChecklistItem.value.trim();
+            
+            if (!newItem) return;
+            
+            tempChecklist.push(newItem);
+            newChecklistItem.value = '';
+            refreshChecklistItems();
+            newChecklistItem.focus();
+        }
+        
+        // Function to save the checklist
+        function saveChecklist() {
+            if (!selectedCategoryForManagement || !selectedCategoryForManagement.tasks) return;
+            
+            const task = selectedCategoryForManagement.tasks[currentChecklistIndex];
+            
+            // If task was a string, replace with object
+            if (typeof task === 'string') {
+                selectedCategoryForManagement.tasks[currentChecklistIndex] = {
+                    text: task,
+                    checklist: tempChecklist
+                };
+            } else {
+                // Update the checklist on the existing object
+                task.checklist = tempChecklist;
+                
+                // If the checklist is empty and there's no evidence flag, convert back to string
+                if (tempChecklist.length === 0 && !task.evidenceRequired) {
+                    selectedCategoryForManagement.tasks[currentChecklistIndex] = task.text;
+                }
+            }
+            
+            // Close the modal
+            closeModal();
+            
+            // Update the display
+            displayManageRcaItems();
+            
+            // If this category is currently displayed in the main view, update it
+            if (lastSelectedCategory && lastSelectedCategory.name === selectedCategoryForManagement.name) {
+                selectCategory(lastSelectedCategory);
+            }
+            
+            // Update the documentation
+            updateDocumentation();
+        }
+        
+        // Function to close the checklist modal
+        function closeModal() {
+            checklistModal.style.display = 'none';
+        }
+
+        // Function to update documentation preview - Modified to include checklist items
+        function updateDocumentation() {
+            // Start with the header
+            let documentation = "Tasks performed during Troubleshoot:\n\n";
+            
+            // Check if we have any selected tasks
+            const hasSelectedTasks = Object.keys(selectedTasks).length > 0;
+            
+            // Track RCAs that require evidence
+            let evidenceRequiredRCAs = [];
+            
+            // For direct debug output in the preview
+            let debugInfo = "";
+            if (DEBUG) {
+                debugInfo = "DEBUG INFO:\n";
+                debugInfo += "Selected Tasks Keys: " + Object.keys(selectedTasks).join(", ") + "\n";
+                debugInfo += "Selection Order: " + selectionOrder.length + " items\n";
+                debugInfo += "Has Selected Tasks: " + hasSelectedTasks + "\n\n";
+                
+                console.log("Updating Documentation with selectedTasks:", selectedTasks);
+                console.log("Selection Order:", selectionOrder);
+            }
+            
+            if (hasSelectedTasks) {
+                // Process each categoryPath that has tasks
+                Object.keys(selectedTasks).forEach(categoryPath => {
+                    // Get the tasks for this category
+                    const tasks = selectedTasks[categoryPath];
+                    
+                    if (DEBUG) {
+                        debugInfo += `Category Path: ${categoryPath}, Tasks: ${tasks.length}\n`;
+                    }
+                    
+                    // Only process if there are actually tasks
+                    if (tasks && tasks.length > 0) {
+                        // Handle both 3-part and 4-part paths
+                        let group, section, category;
+                        const parts = categoryPath.split('/');
+                        
+                        if (parts.length === 3) {
+                            // 3-part path: group/section/category
+                            [group, section, category] = parts;
+                        } else if (parts.length > 3) {
+                            // Handle paths with more parts by interpreting:
+                            // First part as group, last part as category, everything in between as section
+                            group = parts[0];
+                            category = parts[parts.length - 1];
+                            section = parts.slice(1, -1).join('/');
+                        } else {
+                            // Skip invalid paths
+                            if (DEBUG) {
+                                debugInfo += `Skipping invalid path: ${categoryPath}\n`;
+                            }
+                            return;
+                        }
+                        
+                        if (DEBUG) {
+                            debugInfo += `Parsed parts: group=${group}, section=${section}, category=${category}\n`;
+                        }
+                        
+                        // Add the full path with more structured format
+                        documentation += `Group: "${group}"  Section: "${section}"  Component: "${category}"\n`;
+                        
+                        // Add each task with a dash prefix
+                        tasks.forEach(task => {
+                            // Handle string or object tasks
+                            if (typeof task === 'string') {
+                                documentation += `- ${task}\n`;
+                            } else if (typeof task === 'object' && task !== null) {
+                                documentation += `- ${task.text}\n`;
+                                
+                                // Add checklist items if present
+                                if (task.checklist && task.checklist.length > 0) {
+                                    task.checklist.forEach(checklistItem => {
+                                        documentation += `  ► ${checklistItem}\n`;
+                                    });
+                                }
+                                
+                                // Add to evidence required list if needed
+                                if (task.evidenceRequired) {
+                                    evidenceRequiredRCAs.push({
+                                        task: task.text,
+                                        path: `${group} > ${section} > ${category}`
+                                    });
+                                }
+                            }
+                        });
+                        documentation += "\n"; // Add extra newline after tasks
+                    }
+                });
+                
+                // Add "Issue Solved after" section if checkbox is checked and we have selections
+                if (fixedCheckbox.checked && selectionOrder.length > 0) {
+                    const lastItem = getLastSelectedRca();
+                    if (lastItem) {
+                        // Get the task text considering it might be a string or object
+                        const taskText = typeof lastItem.task === 'string' ? 
+                            lastItem.task : 
+                            lastItem.task.text;
+                            
+                        documentation += `Issue Solved after: ${lastItem.group} > ${lastItem.section} > ${lastItem.category} > ${taskText}\n\n`;
+                    }
+                }
+                
+                // Add evidence section if we have RCAs that require evidence
+                if (evidenceRequiredRCAs.length > 0) {
+                    documentation += "Evidence Attached for:\n";
+                    
+                    // Add each evidence-required RCA as a bullet point
+                    evidenceRequiredRCAs.forEach(item => {
+                        documentation += `- ${item.task}\n`;
+                    });
+                    
+                    documentation += "\n";
+                }
+                
+                // Add comments if any
+                if (commentsTextarea.value.trim()) {
+                    documentation += `Additional Comments:\n${commentsTextarea.value.trim()}`;
+                }
+                
+                // If debug is enabled, add debug info at the end
+                if (DEBUG) {
+                    documentation += "\n\n" + debugInfo;
+                }
+            } else {
+                documentation = "No tasks selected. Documentation will appear here as you select RCA items.";
+                
+                // If debug is enabled and no tasks selected, still show debug info
+                if (DEBUG) {
+                    documentation += "\n\n" + debugInfo;
+                }
+            }
+            
+            // Update the preview with the documentation
+            documentationPreview.textContent = documentation;
+        }
+
+        // Function to copy documentation to clipboard
+        function copyToClipboard() {
+            let textToCopy = documentationPreview.textContent;
+            
+            // If in debug mode, remove the debug info section before copying
+            if (DEBUG) {
+                textToCopy = textToCopy.split("\n\nDEBUG INFO:")[0];
+            }
+            
+            if (!textToCopy.trim() || textToCopy.includes('No tasks selected')) {
+                alert('No documentation to copy.');
+                return;
+            }
+            
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    // Provide feedback that copy was successful
+                    showFeedback(copyButton, '✓ Copied!');
+                })
+                .catch(err => {
+                    console.error('Failed to copy text: ', err);
+                    alert('Failed to copy to clipboard: ' + err);
+                });
+        }
+
+        // Function to add a new group
+        function addNewGroup() {
+            const groupName = newGroupNameInput.value.trim();
+            
+            if (!groupName) {
+                alert('Please enter a group name');
+                return;
+            }
+            
+            // Check if group already exists
+            const groupExists = appData.groups.some(g => g.name.toLowerCase() === groupName.toLowerCase());
+            if (groupExists) {
+                alert('A group with this name already exists');
+                return;
+            }
+            
+            // Add new group
+            const newGroup = {
+                name: groupName,
+                sections: []
+            };
+            
+            appData.groups.push(newGroup);
+            
+            // Update displays
+            displayManageGroups();
+            populateGroupDropdown();
+            
+            // Clear input
+            newGroupNameInput.value = '';
+            
+            // Select the new group for management
+            selectGroupForManagement(newGroup, appData.groups.length - 1);
+            
+            // Show feedback
+            showFeedback(addGroupBtn, 'Added!');
+        }
+
+        // Function to add a new section
+        function addNewSection() {
+            if (!selectedGroupForManagement) {
+                alert('Please select a group first');
+                return;
+            }
+            
+            const sectionName = newSectionNameInput.value.trim();
+            
+            if (!sectionName) {
+                alert('Please enter a section name');
+                return;
+            }
+            
+            // Check if section already exists in this group
+            if (!selectedGroupForManagement.sections) {
+                selectedGroupForManagement.sections = [];
+            }
+            
+            const sectionExists = selectedGroupForManagement.sections.some(s => 
+                s.name.toLowerCase() === sectionName.toLowerCase()
+            );
+            
+            if (sectionExists) {
+                alert('This section already exists in the selected group');
+                return;
+            }
+            
+            // Add new section
+            const newSection = {
+                name: sectionName,
+                categories: []
+            };
+            
+            selectedGroupForManagement.sections.push(newSection);
+            
+            // Update displays
+            displayManageSections();
+            
+            // If this is the currently selected group in the documentation tab, update the dropdown
+            if (lastSelectedGroup && lastSelectedGroup.name === selectedGroupForManagement.name) {
+                handleGroupChange();
+            }
+            
+            // Clear input
+            newSectionNameInput.value = '';
+            
+            // Select the new section for management
+            selectSectionForManagement(newSection, selectedGroupForManagement.sections.length - 1);
+            
+            // Show feedback
+            showFeedback(addSectionBtn, 'Added!');
+        }
+
+        // Function to add a new category
+        function addNewCategory() {
+            if (!selectedSectionForManagement) {
+                alert('Please select a section first');
+                return;
+            }
+            
+            const categoryName = newCategoryNameInput.value.trim();
+            
+            if (!categoryName) {
+                alert('Please enter a category name');
+                return;
+            }
+            
+            // Check if category already exists in this section
+            if (!selectedSectionForManagement.categories) {
+                selectedSectionForManagement.categories = [];
+            }
+            
+            const categoryExists = selectedSectionForManagement.categories.some(c => 
+                c.name.toLowerCase() === categoryName.toLowerCase()
+            );
+            
+            if (categoryExists) {
+                alert('This category already exists in the selected section');
+                return;
+            }
+            
+            // Add new category
+            const newCategory = {
+                name: categoryName,
+                tasks: []
+            };
+            
+            selectedSectionForManagement.categories.push(newCategory);
+            
+            // Update displays
+            displayManageCategories();
+            
+            // If this is the currently selected section in the documentation tab, update the display
+            if (lastSelectedSection && lastSelectedSection.name === selectedSectionForManagement.name) {
+                displayCategories(selectedSectionForManagement.categories);
+            }
+            
+            // Clear input
+            newCategoryNameInput.value = '';
+            
+            // Select the new category for management
+            selectCategoryForManagement(newCategory, selectedSectionForManagement.categories.length - 1);
+            
+            // Show feedback
+            showFeedback(addCategoryBtn, 'Added!');
+        }
+
+        // Function to add a new RCA item
+        function addNewRca() {
+            if (!selectedCategoryForManagement) {
+                alert('Please select a category first');
+                return;
+            }
+            
+            const rcaName = newRcaNameInput.value.trim();
+            
+            if (!rcaName) {
+                alert('Please enter an RCA description');
+                return;
+            }
+            
+            // Check if RCA already exists in this category
+            if (!selectedCategoryForManagement.tasks) {
+                selectedCategoryForManagement.tasks = [];
+            }
+            
+            const rcaExists = selectedCategoryForManagement.tasks.some(task => {
+                if (typeof task === 'string') {
+                    return task.toLowerCase() === rcaName.toLowerCase();
+                } else if (typeof task === 'object' && task.text) {
+                    return task.text.toLowerCase() === rcaName.toLowerCase();
+                }
+                return false;
+            });
+            
+            if (rcaExists) {
+                alert('This RCA item already exists in the selected category');
+                return;
+            }
+            
+            // Parse checklist items
+            const checklistText = newRcaChecklist.value.trim();
+            const checklistItems = checklistText ? checklistText.split('\n').filter(item => item.trim()) : [];
+            
+            // Determine if we need an object or string format
+            if (newRcaEvidence.checked || checklistItems.length > 0) {
+                // Use object format with evidence and/or checklist
+                const newRca = {
+                    text: rcaName
+                };
+                
+                if (newRcaEvidence.checked) {
+                    newRca.evidenceRequired = true;
+                }
+                
+                if (checklistItems.length > 0) {
+                    newRca.checklist = checklistItems;
+                }
+                
+                selectedCategoryForManagement.tasks.push(newRca);
+            } else {
+                // Use simple string format
+                selectedCategoryForManagement.tasks.push(rcaName);
+            }
+            
+            // Update displays
+            displayManageRcaItems();
+            
+            // If this is the currently selected category in the documentation tab, update the display
+            if (lastSelectedCategory && lastSelectedCategory.name === selectedCategoryForManagement.name) {
+                selectCategory(lastSelectedCategory);
+            }
+            
+            // Update the category counters
+            updateAllCounters();
+            
+            // Clear inputs
+            newRcaNameInput.value = '';
+            newRcaChecklist.value = '';
+            newRcaEvidence.checked = false;
+            
+            // Show feedback
+            showFeedback(addRcaBtn, 'Added!');
+        }
+
+        // Function to delete a group
+        function deleteSelectedGroup() {
+            if (!selectedGroupForManagement) {
+                alert('Please select a group first');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete the group "${selectedGroupForManagement.name}" and all its sections, categories, and RCA items?`)) {
+                const groupIndex = appData.groups.findIndex(g => g.name === selectedGroupForManagement.name);
+                
+                if (groupIndex !== -1) {
+                    // Before removing, clean up any selected tasks from this group
+                    cleanupSelectedTasksForGroup(selectedGroupForManagement.name);
+                    
+                    // Remove the group
+                    appData.groups.splice(groupIndex, 1);
+                    
+                    // Update displays
+                    displayManageGroups();
+                    populateGroupDropdown();
+                    
+                    // Hide section and category management
+                    sectionManagement.classList.add('hidden');
+                    categoryManagement.classList.add('hidden');
+                    rcaManagement.classList.add('hidden');
+                    
+                    // Reset selections
+                    selectedGroupForManagement = null;
+                    selectedSectionForManagement = null;
+                    selectedCategoryForManagement = null;
+                    
+                    // Update documentation
+                    updateDocumentation();
+                }
+            }
+        }
+
+        // Function to delete a section
+        function deleteSelectedSection() {
+            if (!selectedSectionForManagement || !selectedGroupForManagement) {
+                alert('Please select a section first');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete the section "${selectedSectionForManagement.name}" and all its categories and RCA items?`)) {
+                const sectionIndex = selectedGroupForManagement.sections.findIndex(s => s.name === selectedSectionForManagement.name);
+                
+                if (sectionIndex !== -1) {
+                    // Before removing, clean up any selected tasks from this section
+                    cleanupSelectedTasksForSection(selectedGroupForManagement.name, selectedSectionForManagement.name);
+                    
+                    // Remove the section
+                    selectedGroupForManagement.sections.splice(sectionIndex, 1);
+                    
+                    // Update displays
+                    displayManageSections();
+                    
+                    // If this is the currently selected group in the documentation tab, update the dropdown
+                    if (lastSelectedGroup && lastSelectedGroup.name === selectedGroupForManagement.name) {
+                        handleGroupChange();
+                    }
+                    
+                    // Hide category management
+                    categoryManagement.classList.add('hidden');
+                    rcaManagement.classList.add('hidden');
+                    
+                    // Reset selections
+                    selectedSectionForManagement = null;
+                    selectedCategoryForManagement = null;
+                    
+                    // Update documentation
+                    updateDocumentation();
+                }
+            }
+        }
+
+        // Function to delete a category
+        function deleteSelectedCategory() {
+            if (!selectedCategoryForManagement || !selectedSectionForManagement || !selectedGroupForManagement) {
+                alert('Please select a category first');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete the category "${selectedCategoryForManagement.name}" and all its RCA items?`)) {
+                const categoryIndex = selectedSectionForManagement.categories.findIndex(c => c.name === selectedCategoryForManagement.name);
+                
+                if (categoryIndex !== -1) {
+                    // Before removing, clean up any selected tasks from this category
+                    const categoryPath = `${selectedGroupForManagement.name}/${selectedSectionForManagement.name}/${selectedCategoryForManagement.name}`;
+                    if (selectedTasks[categoryPath]) {
+                        delete selectedTasks[categoryPath];
+                    }
+                    
+                    // Remove related entries from selection order
+                    selectionOrder = selectionOrder.filter(item => item.path !== categoryPath);
+                    
+                    // Remove the category
+                    selectedSectionForManagement.categories.splice(categoryIndex, 1);
+                    
+                    // Update displays
+                    displayManageCategories();
+                    
+                    // If this is the currently selected section in the documentation tab, update the display
+                    if (lastSelectedSection && lastSelectedSection.name === selectedSectionForManagement.name) {
+                        displayCategories(selectedSectionForManagement.categories);
+                    }
+                    
+                    // Hide RCA management
+                    rcaManagement.classList.add('hidden');
+                    
+                    // Reset selection
+                    selectedCategoryForManagement = null;
+                    
+                    // Update documentation
+                    updateDocumentation();
+                }
+            }
+        }
+
+        // Function to delete an RCA item
+        function deleteRcaItem(index) {
+            if (!selectedCategoryForManagement) return;
+            
+            if (confirm(`Are you sure you want to delete this RCA item?`)) {
+                // Store task info for clean-up
+                const task = selectedCategoryForManagement.tasks[index];
+                
+                // Remove the task
+                selectedCategoryForManagement.tasks.splice(index, 1);
+                
+                // Update displays
+                displayManageRcaItems();
+                
+                // If this is the currently selected category in the documentation tab, update the display
+                if (lastSelectedCategory && lastSelectedCategory.name === selectedCategoryForManagement.name) {
+                    selectCategory(lastSelectedCategory);
+                }
+                
+                // Clean up selected tasks if needed
+                if (selectedGroupForManagement && selectedSectionForManagement) {
+                    const categoryPath = `${selectedGroupForManagement.name}/${selectedSectionForManagement.name}/${selectedCategoryForManagement.name}`;
+                    if (selectedTasks[categoryPath]) {
+                        selectedTasks[categoryPath] = selectedTasks[categoryPath].filter(t => {
+                            if (typeof t === 'string' && typeof task === 'string') {
+                                return t !== task;
+                            } else if (typeof t === 'object' && typeof task === 'object') {
+                                return t.text !== task.text;
+                            } else if (typeof t === 'object' && typeof task === 'string') {
+                                return t.text !== task;
+                            } else if (typeof t === 'string' && typeof task === 'object') {
+                                return t !== task.text;
+                            }
+                            return true;
+                        });
+                        
+                        if (selectedTasks[categoryPath].length === 0) {
+                            delete selectedTasks[categoryPath];
+                        }
+                    }
+                    
+                    // Remove from selection order
+                    selectionOrder = selectionOrder.filter(item => {
+                        const itemTask = typeof item.task === 'string' ? item.task : item.task.text;
+                        const currentTask = typeof task === 'string' ? task : task.text;
+                        return !(item.path === categoryPath && itemTask === currentTask);
+                    });
+                }
+                
+                // Update counters and documentation
+                updateAllCounters();
+                updateDocumentation();
+            }
+        }
+
+        // Helper function to clean up selected tasks for a deleted group
+        function cleanupSelectedTasksForGroup(groupName) {
+            // Find and remove all selected tasks that belong to this group
+            Object.keys(selectedTasks).forEach(categoryPath => {
+                if (categoryPath.startsWith(groupName + '/')) {
+                    delete selectedTasks[categoryPath];
+                }
+            });
+            
+            // Remove from selection order
+            selectionOrder = selectionOrder.filter(item => item.group !== groupName);
+        }
+
+        // Helper function to clean up selected tasks for a deleted section
+        function cleanupSelectedTasksForSection(groupName, sectionName) {
+            // Find and remove all selected tasks that belong to this section
+            Object.keys(selectedTasks).forEach(categoryPath => {
+                if (categoryPath.startsWith(`${groupName}/${sectionName}/`)) {
+                    delete selectedTasks[categoryPath];
+                }
+            });
+            
+            // Remove from selection order
+            selectionOrder = selectionOrder.filter(item => 
+                !(item.group === groupName && item.section === sectionName)
+            );
+        }
+
+        // Function to save the JSON file
+        function saveJsonFile() {
+            if (!appData.groups.length) {
+                alert('No data to save');
+                return;
+            }
+            
+            // Create JSON object
+            const jsonData = {
+                groups: appData.groups,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            // Convert to JSON string
+            const jsonString = JSON.stringify(jsonData, null, 2);
+            
+            // Create blob and download link
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = jsonFileName;
+            a.click();
+            
+            // Clean up
+            URL.revokeObjectURL(url);
+            
+            // Show feedback
+            showFeedback(saveCategoriesBtn, 'Saved!');
+            
+            // Update last updated time
+            const now = new Date();
+            lastUpdatedTime.textContent = now.toLocaleString();
+            lastUpdatedSection.classList.remove('hidden');
+        }
+
+        // Function to parse CSV/TSV data
+        function parseCSVData(data) {
+            // Determine if data is CSV or TSV
+            const delimiter = data.includes('\t') ? '\t' : ',';
+            
+            // Split into rows and columns
+            const rows = data.split(/\r?\n/).filter(row => row.trim() !== '');
+            
+            // Get headers from first row
+            const headers = rows[0].split(delimiter).map(h => h.trim());
+            
+            // Parse data rows
+            const result = [];
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i].split(delimiter);
+                if (row.length === headers.length) {
+                    const rowData = {};
+                    for (let j = 0; j < headers.length; j++) {
+                        rowData[headers[j]] = row[j].trim();
+                    }
+                    result.push(rowData);
+                }
+            }
+            
+            return result;
+        }
+
+        // Function to preview CSV data
+        function previewCsvData() {
+            const csvData = csvDataTextarea.value.trim();
+            if (!csvData) {
+                alert('Please paste data into the text area first');
+                return;
+            }
+            
+            try {
+                // Show progress indicator
+                importProgress.style.display = 'block';
+                
+                // Parse the CSV data
+                const jsonData = parseCSVData(csvData);
+                
+                if (!jsonData.length) {
+                    importProgress.style.display = 'none';
+                    alert('No valid data found in the pasted content.');
+                    return;
+                }
+                
+                // Display preview
+                let preview = '<table class="data-table">';
+                
+                // Headers
+                preview += '<tr>';
+                const headers = Object.keys(jsonData[0] || {});
+                headers.forEach(header => {
+                    preview += `<th>${header}</th>`;
+                });
+                preview += '</tr>';
+                
+                // Data (first 10 rows)
+                const previewRows = jsonData.slice(0, 10);
+                previewRows.forEach(row => {
+                    preview += '<tr>';
+                    headers.forEach(header => {
+                        preview += `<td>${row[header] || ''}</td>`;
+                    });
+                    preview += '</tr>';
+                });
+                
+                preview += '</table>';
+                
+                if (jsonData.length > 10) {
+                    preview += `<p><em>Showing 10 of ${jsonData.length} rows</em></p>`;
+                }
+                
+                // Display preview
+                csvPreview.innerHTML = preview;
+                previewContainer.classList.remove('hidden');
+                
+                // Hide progress indicator
+                importProgress.style.display = 'none';
+            } catch (error) {
+                importProgress.style.display = 'none';
+                alert('Error parsing data: ' + error.message);
+            }
+        }
+
+        // Function to import CSV data
+        function importCsvData() {
+            const csvData = csvDataTextarea.value.trim();
+            if (!csvData) {
+                alert('Please paste data into the text area first');
+                return;
+            }
+            
+            if (!confirm('Are you sure you want to import this data? This will add new entries to your current data.')) {
+                return;
+            }
+            
+            try {
+                // Show progress indicator
+                importProgress.style.display = 'block';
+                
+                // Parse the CSV data
+                const jsonData = parseCSVData(csvData);
+                
+                if (!jsonData.length) {
+                    importProgress.style.display = 'none';
+                    alert('No valid data found in the pasted content.');
+                    return;
+                }
+                
+                // Map column names to expected fields (being flexible with column names)
+                const columnMapping = {
+                    'Group': ['Group', 'group'],
+                    'Section': ['Section', 'section'],
+                    'Component': ['Component', 'component', 'Category', 'category'],
+                    'RCA': ['RCA', 'rca', 'Task', 'task']
+                };
+                
+                function findMatchingColumn(data, possibleNames) {
+                    const headers = Object.keys(data[0]);
+                    for (const name of possibleNames) {
+                        if (headers.includes(name)) {
+                            return name;
+                        }
+                    }
+                    return null;
+                }
+                
+                const groupColumn = findMatchingColumn(jsonData, columnMapping.Group);
+                const sectionColumn = findMatchingColumn(jsonData, columnMapping.Section);
+                const componentColumn = findMatchingColumn(jsonData, columnMapping.Component);
+                const rcaColumn = findMatchingColumn(jsonData, columnMapping.RCA);
+                
+                if (!groupColumn || !sectionColumn || !componentColumn || !rcaColumn) {
+                    importProgress.style.display = 'none';
+                    alert('Could not find all required columns (Group, Section, Component, RCA) in the data.');
+                    return;
+                }
+                
+                // Process the data
+                const stats = processImportedData(jsonData, groupColumn, sectionColumn, componentColumn, rcaColumn);
+                
+                // Update displays
+                populateGroupDropdown();
+                displayManageGroups();
+                
+                // Clear the text area
+                csvDataTextarea.value = '';
+                
+                // Hide progress indicator
+                importProgress.style.display = 'none';
+                
+                // Show results
+                alert(`Import complete!\nAdded: ${stats.added} items\nSkipped (duplicates): ${stats.skipped} items`);
+            } catch (error) {
+                importProgress.style.display = 'none';
+                alert('Error importing data: ' + error.message);
+            }
+        }
+
+        // Function to process imported data and update the data structure
+        function processImportedData(jsonData, groupColumn, sectionColumn, componentColumn, rcaColumn) {
+            let stats = { added: 0, skipped: 0 };
+            
+            // Check if we have optional columns
+            const evidenceRequiredColumn = findEvidenceRequiredColumn(jsonData[0]);
+            const checklistColumn = findChecklistColumn(jsonData[0]);
+            
+            if (evidenceRequiredColumn) {
+                console.log(`Found Evidence Required column: ${evidenceRequiredColumn}`);
+            }
+            
+            if (checklistColumn) {
+                console.log(`Found Checklist column: ${checklistColumn}`);
+            }
+            
+            // Process each row
+            jsonData.forEach(row => {
+                // Extract values using the matched column names
+                const group = row[groupColumn];
+                const section = row[sectionColumn];
+                const component = row[componentColumn];
+                const rca = row[rcaColumn];
+                
+                // Check if this RCA requires evidence
+                const evidenceRequired = evidenceRequiredColumn ? 
+                    (row[evidenceRequiredColumn]?.toLowerCase() === 'yes' || 
+                     row[evidenceRequiredColumn]?.toLowerCase() === 'true' || 
+                     row[evidenceRequiredColumn] === '1') : false;
+                
+                // Check if there's a checklist
+                const checklistItems = checklistColumn && row[checklistColumn] ? 
+                    row[checklistColumn].split(';').map(item => item.trim()).filter(item => item) : [];
+                
+                if (!group || !section || !component || !rca) {
+                    stats.skipped++;
+                    return;
+                }
+                
+                // Find or create group
+                let groupObj = appData.groups.find(g => g.name === group);
+                if (!groupObj) {
+                    groupObj = { name: group, sections: [] };
+                    appData.groups.push(groupObj);
+                }
+                
+                // Find or create section
+                let sectionObj = groupObj.sections.find(s => s.name === section);
+                if (!sectionObj) {
+                    sectionObj = { name: section, categories: [] };
+                    groupObj.sections.push(sectionObj);
+                }
+                
+                // Find or create category (component)
+                let categoryObj = sectionObj.categories.find(c => c.name === component);
+                if (!categoryObj) {
+                    categoryObj = { name: component, tasks: [] };
+                    sectionObj.categories.push(categoryObj);
+                }
+                
+                // Check if this RCA already exists
+                const existingTaskIndex = categoryObj.tasks.findIndex(task => 
+                    typeof task === 'string' ? task === rca : task.text === rca
+                );
+                
+                if (existingTaskIndex === -1) {
+                    // Add as new task
+                    if (evidenceRequiredColumn || checklistColumn) {
+                        // Check if we need an object with either evidence or checklist or both
+                        if (evidenceRequired || checklistItems.length > 0) {
+                            const newRca = { text: rca };
+                            
+                            if (evidenceRequired) {
+                                newRca.evidenceRequired = true;
+                            }
+                            
+                            if (checklistItems.length > 0) {
+                                newRca.checklist = checklistItems;
+                            }
+                            
+                            categoryObj.tasks.push(newRca);
+                        } else {
+                            // Simple string is enough
+                            categoryObj.tasks.push(rca);
+                        }
+                    } else {
+                        // No special columns, add as simple string
+                        categoryObj.tasks.push(rca);
+                    }
+                    stats.added++;
+                } else {
+                    // If task exists and we have evidence required info or checklist, update it
+                    const existingTask = categoryObj.tasks[existingTaskIndex];
+                    
+                    if (evidenceRequiredColumn || checklistColumn) {
+                        // If task is a string but we need to add properties, convert to object
+                        if (typeof existingTask === 'string' && (evidenceRequired || checklistItems.length > 0)) {
+                            categoryObj.tasks[existingTaskIndex] = {
+                                text: existingTask,
+                                ...(evidenceRequired && { evidenceRequired: true }),
+                                ...(checklistItems.length > 0 && { checklist: checklistItems })
+                            };
+                        } 
+                        // If task is already an object, update properties
+                        else if (typeof existingTask === 'object') {
+                            if (evidenceRequiredColumn) {
+                                existingTask.evidenceRequired = evidenceRequired;
+                            }
+                            
+                            if (checklistColumn && checklistItems.length > 0) {
+                                existingTask.checklist = checklistItems;
+                            }
+                        }
+                    }
+                    stats.skipped++;
+                }
+            });
+            
+            return stats;
+        }
+        
+        // Helper function to find the Evidence Required column
+        function findEvidenceRequiredColumn(firstRow) {
+            if (!firstRow) return null;
+            
+            const possibleNames = [
+                'Evidence Required', 'EvidenceRequired', 'Evidence_Required',
+                'Required Evidence', 'RequiredEvidence', 'Required_Evidence',
+                'Evidence'
+            ];
+            
+            const headers = Object.keys(firstRow);
+            for (const name of possibleNames) {
+                const foundHeader = headers.find(header => 
+                    header.toLowerCase() === name.toLowerCase()
+                );
+                if (foundHeader) return foundHeader;
+            }
+            
+            return null;
+        }
+        
+        // Helper function to find the Checklist column
+        function findChecklistColumn(firstRow) {
+            if (!firstRow) return null;
+            
+            const possibleNames = [
+                'Checklist', 'CheckList', 'Check List', 'Check_List', 
+                'Steps', 'Troubleshooting Steps', 'TroubleshootingSteps'
+            ];
+            
+            const headers = Object.keys(firstRow);
+            for (const name of possibleNames) {
+                const foundHeader = headers.find(header => 
+                    header.toLowerCase() === name.toLowerCase()
+                );
+                if (foundHeader) return foundHeader;
+            }
+            
+            return null;
+        }
+
+        // Utility function to show temporary feedback on buttons
+        function showFeedback(button, message) {
+            const originalText = button.textContent;
+            button.textContent = message;
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+            }, 2000);
+        }
+
+        // Close modal when clicking outside of it
+        window.addEventListener('click', (event) => {
+            if (event.target === checklistModal) {
+                closeModal();
+            }
+        });
+    </script>
+
+
+</body></html>
