@@ -1,0 +1,1119 @@
+<!DOCTYPE html><html lang="en"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Siemens Roundtable Q&amp;A</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add jsPDF and html2canvas libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        primaryDark: '#4a49b0',
+                        siemens: '#009999',
+                        siemensDark: '#007777',
+                        cardBg: '#ffffff',
+                        cardBgDark: '#222222',
+                        cardHeading: '#333333',
+                        cardHeadingDark: '#f5f5f5',
+                    },
+                    borderRadius: {
+                        'xl': '1rem',
+                    },
+                    boxShadow: {
+                        'apple': '0 4px 10px rgba(0, 0, 0, 0.1)',
+                        'apple-dark': '0 4px 10px rgba(0, 0, 0, 0.5)',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* iPad-specific styles */
+        body {
+            font-size: 16px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+            background-color: #f5f5f7;
+        }
+        
+        html.dark body {
+            background-color: #151515;
+        }
+        
+        button, input {
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        
+        .card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            will-change: transform;
+        }
+        
+        .card:active {
+            transform: scale(0.98);
+        }
+        
+        /* Prevent double-tap zoom */
+        * {
+            touch-action: manipulation;
+        }
+        
+        /* Scrolling grid layout */
+        .category-section {
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+        }
+        
+        .category-section::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .category-card {
+            scroll-snap-align: start;
+        }
+        
+        /* iPad orientation styles */
+        @media (orientation: landscape) {
+            .grid-cols-landscape {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (min-width: 768px) and (max-width: 1024px) {
+            button, input[type="text"] {
+                min-height: 48px;
+            }
+        }
+
+        /* PDF styling */
+        .pdf-container {
+            display: none;
+            position: absolute;
+            left: -9999px;
+            background-color: var(--pdf-bg-color, #ffffff);
+            width: 210mm; /* A4 width */
+            padding: 0;
+            margin: 0;
+        }
+        
+        .pdf-card {
+            margin: 0 auto 20px auto;
+            width: 180mm;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pdf-wide-card {
+            margin: 0 auto 20px auto;
+            width: 180mm;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .pdf-title-page {
+            text-align: center;
+            padding: 40px 20px;
+            color: #009999;
+        }
+        
+        html.dark .pdf-container {
+            --pdf-bg-color: #151515;
+        }
+
+        /* Icon styles */
+        .feature-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            background-color: rgba(0, 153, 153, 0.1);
+        }
+        
+        html.dark .feature-icon {
+            background-color: rgba(0, 153, 153, 0.2);
+        }
+        
+        /* Highlight key phrases */
+        .highlight {
+            color: #009999;
+            font-weight: 600;
+        }
+        
+        html.dark .highlight {
+            color: #00b3b3;
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+        }
+
+        .loading-spinner {
+            border: 5px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 5px solid #009999;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* PDF template container - hidden from view initially */
+        #pdf-template-container {
+            display: none;
+        }
+        
+        /* Card pair for PDF */
+        .pdf-card-pair {
+            page-break-after: always;
+            height: 297mm; /* A4 height */
+            width: 210mm; /* A4 width */
+            position: relative;
+            background-color: var(--pdf-bg-color, #ffffff);
+            overflow: hidden;
+            padding: 15mm 15mm 20mm 15mm; /* Margins */
+        }
+        
+        /* Single card that takes a full page */
+        .pdf-full-page-card {
+            page-break-after: always;
+            height: 297mm; /* A4 height */
+            width: 210mm; /* A4 width */
+            position: relative;
+            background-color: var(--pdf-bg-color, #ffffff);
+            overflow: hidden;
+            padding: 15mm 15mm 20mm 15mm; /* Margins */
+        }
+        
+        /* Page numbers */
+        .pdf-page-number {
+            position: absolute;
+            bottom: 10mm;
+            right: 15mm;
+            font-size: 10pt;
+            color: #777;
+        }
+        
+        /* Title page styling */
+        .pdf-title-page {
+            height: 297mm; /* A4 height */
+            width: 210mm; /* A4 width */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--pdf-bg-color, #ffffff);
+            page-break-after: always;
+        }
+        
+        .pdf-title-page h1 {
+            font-size: 32pt;
+            color: #009999;
+            margin-bottom: 10mm;
+        }
+        
+        .pdf-title-page p {
+            font-size: 16pt;
+            color: #555;
+            margin-bottom: 5mm;
+        }
+        
+        .pdf-logo {
+            width: 60mm;
+            height: 60mm;
+            background-color: #009999;
+            border-radius: 50%;
+            margin: 20mm 0;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="container mx-auto px-4 py-6">
+        <!-- Header -->
+        <div id="header-controls" class="flex flex-col md:flex-row justify-between items-center mb-6 no-print">
+            <div>
+                <h1 class="text-3xl font-bold text-siemens dark:text-siemens mb-2 md:mb-0">Siemens Roundtable Q&amp;A</h1>
+                <p class="text-gray-600 dark:text-gray-400">May 6th, 2025 | Siemens "Mitras" Factory, Nuevo León</p>
+            </div>
+            <div class="flex space-x-4 mt-4 md:mt-0">
+                <button id="dark-mode-toggle" class="px-5 py-3 bg-gray-200 dark:bg-gray-700 rounded-xl text-lg">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block"></i>
+                </button>
+                <button id="save-pdf-button" class="px-5 py-3 bg-siemens hover:bg-siemensDark text-white rounded-xl text-lg">
+                    <i class="fas fa-file-pdf mr-2"></i> Generate PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container mb-8 no-print">
+            <div class="relative">
+                <input id="search-input" type="text" placeholder="Search questions or keywords..." class="w-full p-4 pl-12 text-xl border border-gray-300 dark:border-gray-700 rounded-xl dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-siemens">
+                <i class="fas fa-search absolute left-4 top-5 text-gray-500 dark:text-gray-400 text-xl"></i>
+            </div>
+        </div>
+        
+        <!-- Content Areas - Apple-Style Layout -->
+        <div id="all-content" class="space-y-12">
+            <!-- Questions 1-3 -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-200">Questions 1-3</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Question 1 -->
+                    <div class="card bg-cardBg dark:bg-cardBgDark rounded-xl shadow-apple dark:shadow-apple-dark overflow-hidden" data-number="1" data-content="Participation in Business Events &amp; Chambers to understand real needs. We need to align to the ecosystem, not the other way around. Understanding the core of the businesses to adapt our solutions. AI is transforming the market and we see a future with less apps but more customization.">
+                        <div class="p-6">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-siemens text-white font-bold mr-4 flex-shrink-0">
+                                    1
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-2 text-cardHeading dark:text-cardHeadingDark">How can technology leaders such as Ternium, Sigma Alimentos, Softtek, Heineken, and others in northern Mexico better align their offerings with the specific needs of Mexican and Latin American businesses?</h3>
+                                    
+                                    <div class="feature-icon text-siemens mt-3 mb-4">
+                                        <i class="fas fa-handshake text-xl"></i>
+                                    </div>
+                                    
+                                    <div class="text-lg text-gray-700 dark:text-gray-300">
+                                        <p><span class="highlight">Best practices:</span> Participation in Business Events &amp; Chambers to understand real needs.</p>
+                                        <p class="mt-2"><span class="highlight">Our findings:</span> We need to align to the ecosystem, not the other way around.</p>
+                                        <p class="mt-2">Our goal is understanding the core of the businesses to adapt our solutions. AI is transforming the market and we see a future with less apps but more customization.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 2 -->
+                    <div class="card bg-cardBg dark:bg-cardBgDark rounded-xl shadow-apple dark:shadow-apple-dark overflow-hidden" data-number="2" data-content="Cost Optimization: CIOs in Mexico must optimize costs due to instability in the trading relationship with the United States. This involves optimizing internal IT costs and enabling business areas through technologies. AI Implementation: Effective AI can reduce operating and R&amp;D costs by 15% to 25% over the next 18 months. Market Diversification: Mexican companies are diversifying export markets due to potential challenges with US market access.">
+                        <div class="p-6">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-siemens text-white font-bold mr-4 flex-shrink-0">
+                                    2
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-2 text-cardHeading dark:text-cardHeadingDark">What challenges do Mexican CIOs such as yourselves face in adopting advanced technologies?</h3>
+                                    
+                                    <div class="feature-icon text-siemens mt-3 mb-4">
+                                        <i class="fas fa-chart-line text-xl"></i>
+                                    </div>
+                                    
+                                    <div class="text-lg text-gray-700 dark:text-gray-300">
+                                        <p><span class="highlight">Action 1: Cost Optimization</span><br>
+                                        CIOs in Mexico must optimize costs due to instability in the trading relationship with the United States. This involves:</p>
+                                        <ul class="list-disc ml-5 mt-1">
+                                            <li>Optimizing internal IT costs</li>
+                                            <li>Enabling business areas through technologies that improve supply chain, product lifecycle management, inventory, and storage systems</li>
+                                        </ul>
+                                        <p class="mt-3"><span class="highlight">AI Implementation:</span> Effective AI can reduce operating and R&amp;D costs by 15% to 25% over the next 18 months. Our use of generative AI for logistics and preventive maintenance reduced operating costs by 18% in 6 months while improving quality.</p>
+                                        <p class="mt-3"><span class="highlight">Action 2: Market Diversification</span><br>
+                                        Mexican companies are diversifying export markets due to potential challenges with US market access, requiring:</p>
+                                        <ul class="list-disc ml-5 mt-1">
+                                            <li>Using advanced data analytics and AI to evaluate global markets</li>
+                                            <li>Developing flexible technology platforms to quickly adapt to new market demands</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 3 -->
+                    <div class="card bg-cardBg dark:bg-cardBgDark rounded-xl shadow-apple dark:shadow-apple-dark overflow-hidden md:col-span-2" data-number="3" data-content="IT/OT Integration for Smart Factories using BlauLabs I4.0 Accelerator for real-time production &amp; asset monitoring and legacy system integration. Generative AI-Driven Innovation with FRIDA &amp; AI Tools. AI-powered design automation for rapid prototyping and process optimization. Tool-Agnostic - Business &amp; IT process automation for maximum benefits.">
+                        <div class="p-6">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-siemens text-white font-bold mr-4 flex-shrink-0">
+                                    3
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-2 text-cardHeading dark:text-cardHeadingDark">What emerging technologies (AI, edge computing, IoT, etc.) are delivering the most return of investment in your current operations?</h3>
+                                    
+                                    <div class="feature-icon text-siemens mt-3 mb-4">
+                                        <i class="fas fa-microchip text-xl"></i>
+                                    </div>
+                                    
+                                    <div class="text-lg text-gray-700 dark:text-gray-300">
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div>
+                                                <p><span class="highlight">1. IT/OT Integration for Smart Factories</span></p>
+                                                <p>BlauLabs I4.0 Accelerator: Real-time Production &amp; asset monitoring and legacy system integration.</p>
+                                                <p class="mt-2">Case Study: Reduced downtime by 30% for an Asset Performance Management client using predictive maintenance.</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <p><span class="highlight">2. Generative AI-Driven Innovation</span></p>
+                                                <p>FRIDA &amp; AI Tools:</p>
+                                                <ul class="list-disc ml-5 mt-1">
+                                                    <li>AI-powered design automation for rapid prototyping</li>
+                                                    <li>Cut R&amp;D cycles by 40% for aerospace suppliers</li>
+                                                    <li>Tool-Agnostic - Business &amp; IT process automation</li>
+                                                    <li>Intelligent Automation - Combines RPA, AI (ML, NLP), and cognitive computing</li>
+                                                </ul>
+                                            </div>
+                                            
+                                            <div>
+                                                <p><span class="highlight">3. Cybersecurity &amp; Compliance</span></p>
+                                                <ul class="list-disc ml-5 mt-1">
+                                                    <li>Managed IT/OT/ICS Security</li>
+                                                    <li>Security Assessments and Testing</li>
+                                                    <li>Patch Management and Validation</li>
+                                                    <li>Unified IT &amp; OT Monitoring</li>
+                                                    <li>Threat Detection and Prevention</li>
+                                                    <li>Incident Response</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Questions 4-6 -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-200">Questions 4-6</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Question 4 -->
+                    <div class="card bg-cardBg dark:bg-cardBgDark rounded-xl shadow-apple dark:shadow-apple-dark overflow-hidden" data-number="4" data-content="Knowledge Transfer and Talent Development: Establishing knowledge transfer models and alliances to accelerate the adoption of advanced technologies and develop specialized talent in Mexico. Sustainable IT Practices: Collaborating on sustainable IT initiatives that enhance energy efficiency within IT infrastructure and manufacturing processes.">
+                        <div class="p-6">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-siemens text-white font-bold mr-4 flex-shrink-0">
+                                    4
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-2 text-cardHeading dark:text-cardHeadingDark">What opportunities exist for joint innovation, R&amp;D, or co-development of solutions tailored to regional markets (manufacturing, logistics, etc.)?</h3>
+                                    
+                                    <div class="feature-icon text-siemens mt-3 mb-4">
+                                        <i class="fas fa-lightbulb text-xl"></i>
+                                    </div>
+                                    
+                                    <div class="text-lg text-gray-700 dark:text-gray-300">
+                                        <p><span class="highlight">Knowledge Transfer and Talent Development:</span> Establishing knowledge transfer models and alliances to accelerate the adoption of advanced technologies and develop specialized talent in Mexico. This can enhance the region's technological capabilities and competitiveness.</p>
+                                        <p class="mt-3"><span class="highlight">Sustainable IT Practices:</span> Collaborating on sustainable IT initiatives that enhance energy efficiency within IT infrastructure and manufacturing processes. This not only supports environmental goals but also drives long-term value and operational efficiency.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 5 -->
+                    <div class="card bg-cardBg dark:bg-cardBgDark rounded-xl shadow-apple dark:shadow-apple-dark overflow-hidden" data-number="5" data-content="Current situation presents a unique opportunity to strengthen collaboration between global technology providers like Siemens and regional companies. We need solutions that combine global innovation with adaptability to the specific challenges of our region, knowledge transfer models that accelerate the adoption of advanced technologies, alliances for the development of specialized talent in Mexico.">
+                        <div class="p-6">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-siemens text-white font-bold mr-4 flex-shrink-0">
+                                    5
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-2 text-cardHeading dark:text-cardHeadingDark">How can local CIOs influence or contribute to the product and service roadmap of global technology providers?</h3>
+                                    
+                                    <div class="feature-icon text-siemens mt-3 mb-4">
+                                        <i class="fas fa-globe text-xl"></i>
+                                    </div>
+                                    
+                                    <div class="text-lg text-gray-700 dark:text-gray-300">
+                                        <p>Current situation presents a unique opportunity to strengthen collaboration between global technology providers like Siemens and regional companies. We need:</p>
+                                        <ul class="list-disc ml-5 mt-2">
+                                            <li>Solutions that combine global innovation with adaptability to the specific challenges of our region</li>
+                                            <li>Knowledge transfer models that accelerate the adoption of advanced technologies</li>
+                                            <li>Alliances for the development of specialized talent in Mexico</li>
+                                            <li>Participating in joint innovation initiatives: Engaging in co-development projects that leverage local market insights and global technological expertise</li>
+                                            <li>Sharing regional challenges and opportunities: Providing feedback on specific needs and constraints faced in Mexico and Latin America, which can guide the development of tailored solutions</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 6 -->
+                    <div class="card bg-cardBg dark:bg-cardBgDark rounded-xl shadow-apple dark:shadow-apple-dark overflow-hidden md:col-span-2" data-number="6" data-content="Technical debt continued to be a central concern for companies. Although significant resources have been allocated to modernization, many legacy systems are still hindering organizational agility and slowing growth. Technical Debt is a Burden to the Integration of GenAI: Incompatibility with Advanced Technologies, Limitation in Agility, Resources Divergence.">
+                        <div class="p-6">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-siemens text-white font-bold mr-4 flex-shrink-0">
+                                    6
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-2 text-cardHeading dark:text-cardHeadingDark">What are the main barriers to large-scale digital transformation in Mexican businesses - legacy systems, skills gap, regulation, or cost?</h3>
+                                    
+                                    <div class="feature-icon text-siemens mt-3 mb-4">
+                                        <i class="fas fa-exclamation-triangle text-xl"></i>
+                                    </div>
+                                    
+                                    <div class="text-lg text-gray-700 dark:text-gray-300">
+                                        <p><span class="highlight">Technical debt</span> continued to be a central concern for companies. Although significant resources have been allocated to modernization, many legacy systems are still hindering organizational agility and slowing growth.</p>
+                                        <p class="mt-3"><span class="highlight">Technical Debt is a Burden to the Integration of GenAI:</span></p>
+                                        <ul class="list-disc ml-5 mt-1">
+                                            <li>Incompatibility with Advanced Technologies</li>
+                                            <li>Limitation in Agility</li>
+                                            <li>Resources Divergence</li>
+                                        </ul>
+                                        <p class="mt-3">For CIOs, addressing technical debt will be a task of strategic vision and pragmatism. The key will be identifying systems whose update is not only critical but also delivers immediate value to the organization, both operationally and from a business perspective.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Questions 7-9 -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-200">Questions 7-9</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Question 7 -->
+                    <div class="card bg-cardBg dark:bg-cardBgDark rounded-xl shadow-apple dark:shadow-apple-dark overflow-hidden" data-number="7" data-content="At Softtek, we believe developing local tech talent in North America requires intentional, cross-border collaboration. That means partnering with universities, aligning skills with real market needs, and supporting inclusive programs like Codellege—our initiative to train young people from underserved communities in digital skills.">
+                        <div class="p-6">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-siemens text-white font-bold mr-4 flex-shrink-0">
+                                    7
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-2 text-cardHeading dark:text-cardHeadingDark">How can global companies support the development of local tech talent and digital skills?</h3>
+                                    
+                                    <div class="feature-icon text-siemens mt-3 mb-4">
+                                        <i class="fas fa-graduation-cap text-xl"></i>
+                                    </div>
+                                    
+                                    <div class="text-lg text-gray-700 dark:text-gray-300">
+                                        <p>At Softtek, we believe developing local tech talent in North America requires <span class="highlight">intentional, cross-border collaboration</span>. That means partnering with universities, aligning skills with real market needs, and supporting inclusive programs like <span class="highlight">Codellege</span>—our initiative to train young people from underserved communities in digital skills.</p>
+                                        
+                                        <p class="mt-3">Talent has no gender, no nationality—just potential. When we invest in that potential together, we strengthen the region's digital competitiveness.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 8 -->
+                    <div class="card bg-cardBg dark:bg-cardBgDark rounded-xl shadow-apple dark:shadow-apple-dark overflow-hidden" data-number="8" data-content="Absolutely—joint programs are not just valuable, they're necessary. Each brings something essential: policy, research, and real-world demand. At Softtek, we've seen this work through collaborations that go beyond hiring pipelines—like co-developing curricula or launching programs such as Codellege to reach underrepresented communities.">
+                        <div class="p-6">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-siemens text-white font-bold mr-4 flex-shrink-0">
+                                    8
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-2 text-cardHeading dark:text-cardHeadingDark">Is there a role for joint programs with universities, accelerators, or government to build tech capability in Mexico?</h3>
+                                    
+                                    <div class="feature-icon text-siemens mt-3 mb-4">
+                                        <i class="fas fa-university text-xl"></i>
+                                    </div>
+                                    
+                                    <div class="text-lg text-gray-700 dark:text-gray-300">
+                                        <p>Absolutely—joint programs are not just valuable, they're <span class="highlight">necessary</span>. Each brings something essential: policy, research, and real-world demand.</p>
+                                        
+                                        <p class="mt-3">At Softtek, we've seen this work through collaborations that go beyond hiring pipelines—like co-developing curricula or launching programs such as <span class="highlight">Codellege</span> to reach underrepresented communities.</p>
+                                        
+                                        <p class="mt-3">When we design these efforts together, we don't just build skills—we build sustainable ecosystems of innovation.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 9 -->
+                    <div class="card bg-cardBg dark:bg-cardBgDark rounded-xl shadow-apple dark:shadow-apple-dark overflow-hidden md:col-span-2" data-number="9" data-content="Nearshoring and the regionalization of supply chains increase the demand for advanced technologies in Mexico. Companies are seeking IT service partners that can offer real-time collaboration, fast decision-making, and access to specialized talent. This demand is driven by the need for agility and speed, access to specialized talent, and innovation.">
+                        <div class="p-6">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-siemens text-white font-bold mr-4 flex-shrink-0">
+                                    9
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-2 text-cardHeading dark:text-cardHeadingDark">How does nearshoring and the regionalization of supply chains affect technology demands in Mexico?</h3>
+                                    
+                                    <div class="feature-icon text-siemens mt-3 mb-4">
+                                        <i class="fas fa-truck text-xl"></i>
+                                    </div>
+                                    
+                                    <div class="text-lg text-gray-700 dark:text-gray-300">
+                                        <p>Nearshoring and the regionalization of supply chains <span class="highlight">increase the demand for advanced technologies</span> in Mexico. Companies are seeking IT service partners that can offer real-time collaboration, fast decision-making, and access to specialized talent. This demand is driven by the need for:</p>
+                                        <ul class="list-disc ml-5 mt-2">
+                                            <li><span class="highlight">Agility and Speed:</span> Businesses need to respond quickly to market changes and require IT support that can adapt to these changes in real-time.</li>
+                                            <li><span class="highlight">Access to Specialized Talent:</span> There's a need for IT professionals with skills in AI, automation, cloud computing, and other advanced technologies.</li>
+                                            <li><span class="highlight">Innovation:</span> Companies require support to integrate emerging technologies to drive operational efficiencies and achieve measurable business outcomes.</li>
+                                        </ul>
+                                        <p class="mt-3">As a result, Mexico's technology demands are shifting towards services that support technology arbitrage, focusing on leveraging technology to drive business value rather than just reducing labor costs.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Questions 10-13 -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-200">Questions 10-13</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Question 10 -->
+                    <div class="card bg-cardBg dark:bg-cardBgDark rounded-xl shadow-apple dark:shadow-apple-dark overflow-hidden" data-number="10" data-content="Leverage Mexico's GVC growth with tailored tech infrastructure. Hybrid Cloud: Local data centers + global cloud (AWS/Azure) for agility/compliance. 5G &amp; Cross-Border Nets: High-speed industrial IoT + USMCA-aligned connectivity. Cybersecurity: Blockchain-enabled supply chain integrity + threat defense. Nearshoring Bridge: Bilingual IT solutions linking Mexican manufacturers/U.S. partners.">
+                        <div class="p-6">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-siemens text-white font-bold mr-4 flex-shrink-0">
+                                    10
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-2 text-cardHeading dark:text-cardHeadingDark">What tech infrastructure (data centers, cloud services, connectivity) is needed to support Mexico's role in global value chains?</h3>
+                                    
+                                    <div class="feature-icon text-siemens mt-3 mb-4">
+                                        <i class="fas fa-server text-xl"></i>
+                                    </div>
+                                    
+                                    <div class="text-lg text-gray-700 dark:text-gray-300">
+                                        <ul class="list-disc ml-5">
+                                            <li><span class="highlight">Opportunity:</span> Leverage Mexico's GVC growth with tailored tech infrastructure.</li>
+                                            <li><span class="highlight">Hybrid Cloud:</span> Local data centers + global cloud (AWS/Azure) for agility/compliance.</li>
+                                            <li><span class="highlight">5G &amp; Cross-Border Nets:</span> High-speed industrial IoT + USMCA-aligned connectivity.</li>
+                                            <li><span class="highlight">Cybersecurity:</span> Blockchain-enabled supply chain integrity + threat defense.</li>
+                                            <li><span class="highlight">Nearshoring Bridge:</span> Bilingual IT solutions linking Mexican manufacturers/U.S. partners.</li>
+                                            <li><span class="highlight">SME Digitalization:</span> ERP/SCM integration for SMEs entering GVCs.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 11 -->
+                    <div class="card bg-cardBg dark:bg-cardBgDark rounded-xl shadow-apple dark:shadow-apple-dark overflow-hidden" data-number="11" data-content="Security Assessments and Penetration Testing to evaluate the security posture of OT systems, identifying vulnerabilities and weaknesses that could be exploited by attackers. Penetration testing simulates real-world attacks to test the effectiveness of existing security controls. Patch Management and Validation ensuring that OT systems are patched with the latest security updates. Protect hybrid IT/OT environments including clouds and IIOT Integrations.">
+                        <div class="p-6">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-siemens text-white font-bold mr-4 flex-shrink-0">
+                                    11
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-2 text-cardHeading dark:text-cardHeadingDark">How are CIOs managing data sovereignty, privacy, and cybersecurity risks?</h3>
+                                    
+                                    <div class="feature-icon text-siemens mt-3 mb-4">
+                                        <i class="fas fa-lock text-xl"></i>
+                                    </div>
+                                    
+                                    <div class="text-lg text-gray-700 dark:text-gray-300">
+                                        <div class="grid grid-cols-1 gap-4">
+                                            <div>
+                                                <p class="font-semibold text-siemens">Security Assessments</p>
+                                                <ul class="list-disc ml-5 mt-1">
+                                                    <li>Evaluate the security posture of OT systems, identifying vulnerabilities</li>
+                                                    <li>Penetration testing simulates real-world attacks to test security controls</li>
+                                                </ul>
+                                                
+                                                <p class="font-semibold text-siemens mt-4">Patch Management</p>
+                                                <ul class="list-disc ml-5 mt-1">
+                                                    <li>Ensuring OT systems are patched with the latest security updates</li>
+                                                    <li>Patch validation programs test compatibility before deployment</li>
+                                                </ul>
+                                                
+                                                <p class="font-semibold text-siemens mt-4">Unified Monitoring &amp; Incident Response</p>
+                                                <ul class="list-disc ml-5 mt-1">
+                                                    <li>Advanced threat detection using machine learning and behavioral analysis</li>
+                                                    <li>Services to help detect, contain, and recover from breaches</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 12 -->
+                    <div class="card bg-cardBg dark:bg-cardBgDark rounded-xl shadow-apple dark:shadow-apple-dark overflow-hidden" data-number="12" data-content="CIOs are pursuing sustainability goals focused on energy efficiency, carbon reduction, and circular economy principles. Digital solutions like smart factories and energy management systems are key enablers of these sustainability initiatives, providing both environmental benefits and operational cost savings.">
+                        <div class="p-6">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-siemens text-white font-bold mr-4 flex-shrink-0">
+                                    12
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-2 text-cardHeading dark:text-cardHeadingDark">What sustainability goals are CIOs pursuing, and how can digital solutions (smart factories, energy efficiency tech) support these?</h3>
+                                    
+                                    <div class="feature-icon text-siemens mt-3 mb-4">
+                                        <i class="fas fa-leaf text-xl"></i>
+                                    </div>
+                                    
+                                    <div class="text-lg text-gray-700 dark:text-gray-300">
+                                        <p><span class="highlight">Key Sustainability Goals:</span></p>
+                                        <ul class="list-disc ml-5 mt-1">
+                                            <li>Energy efficiency and carbon footprint reduction</li>
+                                            <li>Resource optimization and waste minimization</li>
+                                            <li>Compliance with environmental regulations and reporting standards</li>
+                                            <li>Circular economy implementation in technology lifecycle</li>
+                                        </ul>
+                                        
+                                        <p class="mt-4"><span class="highlight">Digital Enablers:</span></p>
+                                        <ul class="list-disc ml-5 mt-1">
+                                            <li>Smart factories with IoT sensors for real-time energy and resource monitoring</li>
+                                            <li>AI-driven predictive maintenance to reduce waste and extend equipment life</li>
+                                            <li>Digital twins for optimizing operations with minimal environmental impact</li>
+                                            <li>Cloud computing migrations to reduce on-premises data center power consumption</li>
+                                        </ul>
+                                        
+                                        <p class="mt-3">These initiatives create a dual benefit: environmental sustainability and operational cost savings.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 13 -->
+                    <div class="card bg-cardBg dark:bg-cardBgDark rounded-xl shadow-apple dark:shadow-apple-dark overflow-hidden" data-number="13" data-content="An ideal technology partnership combines global expertise with local understanding, provides joint innovation, flexibility in engagement models, and creates sustainable value. What's often missing is true co-creation, knowledge transfer, and long-term strategic alignment.">
+                        <div class="p-6">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-siemens text-white font-bold mr-4 flex-shrink-0">
+                                    13
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-2 text-cardHeading dark:text-cardHeadingDark">What does an ideal technology partnership look like to you - what's missing today?</h3>
+                                    
+                                    <div class="feature-icon text-siemens mt-3 mb-4">
+                                        <i class="fas fa-handshake text-xl"></i>
+                                    </div>
+                                    
+                                    <div class="text-lg text-gray-700 dark:text-gray-300">
+                                        <p><span class="highlight">Ideal Partnership Characteristics:</span></p>
+                                        <ul class="list-disc ml-5 mt-1">
+                                            <li><span class="highlight">Global + Local Perspective:</span> Bringing international best practices with deep understanding of regional challenges</li>
+                                            <li><span class="highlight">Joint Innovation:</span> True co-creation processes where both partners contribute to solution development</li>
+                                            <li><span class="highlight">Knowledge Exchange:</span> Transparent sharing of expertise that builds capabilities on both sides</li>
+                                        </ul>
+                                        
+                                        <p class="mt-4"><span class="highlight">What's Missing Today:</span></p>
+                                        <ul class="list-disc ml-5 mt-1">
+                                            <li>True co-investment in specialized expertise for the region</li>
+                                            <li>Structured knowledge transfer programs that develop local talent</li>
+                                            <li>More agile decision-making structures that respond to regional market dynamics</li>
+                                            <li>Integration of sustainability into partnership metrics and objectives</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden template container for PDF generation -->
+    <div id="pdf-template-container"></div>
+    
+    <script>
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        
+        // Check for dark mode preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        // Listen for changes to color scheme preference
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+        
+        // Dark mode toggle button
+        darkModeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+
+        // Check if dark mode is enabled
+        function isDarkMode() {
+            return document.documentElement.classList.contains('dark');
+        }
+
+        // Create a visual clone of the card for PDF generation
+        function createCardClone(card, forPDF) {
+            const clone = card.cloneNode(true);
+            
+            // Apply styles based on dark mode if needed
+            if (isDarkMode() && forPDF) {
+                clone.style.backgroundColor = '#222222';
+                clone.style.color = '#f5f5f5';
+                
+                // Make sure question number stands out
+                const numberBadge = clone.querySelector('.rounded-full');
+                if (numberBadge) {
+                    numberBadge.style.backgroundColor = '#009999';
+                    numberBadge.style.color = 'white';
+                }
+                
+                // Fix heading color
+                const heading = clone.querySelector('h3');
+                if (heading) {
+                    heading.style.color = '#f5f5f5';
+                }
+                
+                // Fix text color
+                const textElements = clone.querySelectorAll('p, li');
+                textElements.forEach(el => {
+                    el.style.color = '#dddddd';
+                });
+                
+                // Fix highlight colors
+                const highlights = clone.querySelectorAll('.highlight');
+                highlights.forEach(el => {
+                    el.style.color = '#00b3b3';
+                });
+                
+                // Fix icon background
+                const iconContainer = clone.querySelector('.feature-icon');
+                if (iconContainer) {
+                    iconContainer.style.backgroundColor = 'rgba(0, 153, 153, 0.2)';
+                    iconContainer.style.color = '#00b3b3';
+                }
+            } else if (forPDF) {
+                // Light mode styling for PDF
+                clone.style.backgroundColor = '#ffffff';
+                clone.style.color = '#333333';
+                
+                // Make sure question number stands out
+                const numberBadge = clone.querySelector('.rounded-full');
+                if (numberBadge) {
+                    numberBadge.style.backgroundColor = '#009999';
+                    numberBadge.style.color = 'white';
+                }
+                
+                // Fix heading color
+                const heading = clone.querySelector('h3');
+                if (heading) {
+                    heading.style.color = '#333333';
+                }
+                
+                // Fix text color
+                const textElements = clone.querySelectorAll('p, li');
+                textElements.forEach(el => {
+                    el.style.color = '#333333';
+                });
+                
+                // Fix highlight colors
+                const highlights = clone.querySelectorAll('.highlight');
+                highlights.forEach(el => {
+                    el.style.color = '#009999';
+                });
+                
+                // Fix icon background
+                const iconContainer = clone.querySelector('.feature-icon');
+                if (iconContainer) {
+                    iconContainer.style.backgroundColor = 'rgba(0, 153, 153, 0.1)';
+                    iconContainer.style.color = '#009999';
+                }
+            }
+            
+            return clone;
+        }
+
+        // Save as PDF functionality
+        document.getElementById('save-pdf-button').addEventListener('click', async () => {
+            // Show loading overlay
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.className = 'loading-overlay';
+            loadingOverlay.innerHTML = `
+                <div class="loading-spinner"></div>
+                <p class="text-xl mb-2">Generating PDF...</p>
+                <p>This may take a moment</p>
+            `;
+            document.body.appendChild(loadingOverlay);
+            
+            try {
+                // Get all cards
+                const cards = document.querySelectorAll('.card');
+                
+                // Access jsPDF
+                const { jsPDF } = window.jspdf;
+                
+                // Create a new PDF document
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                // Add title page
+                pdf.setFillColor(isDarkMode() ? '#151515' : '#ffffff');
+                pdf.rect(0, 0, 210, 297, 'F');
+                
+                pdf.setFontSize(28);
+                pdf.setTextColor(isDarkMode() ? '#00b3b3' : '#009999');
+                pdf.text('Siemens Roundtable Q&A', 105, 80, { align: 'center' });
+                
+                pdf.setFontSize(16);
+                pdf.setTextColor(isDarkMode() ? '#dddddd' : '#555555');
+                pdf.text('May 6th, 2025', 105, 100, { align: 'center' });
+                pdf.text('Siemens "Mitras" Factory, Nuevo León', 105, 110, { align: 'center' });
+                
+                // Add Siemens logo or placeholder
+                pdf.setFillColor(isDarkMode() ? '#00b3b3' : '#009999');
+                pdf.rect(85, 130, 40, 40, 'F');
+                
+                // Add generation date
+                pdf.setFontSize(10);
+                pdf.setTextColor(isDarkMode() ? '#999999' : '#777777');
+                const today = new Date();
+                pdf.text(`Generated: ${today.toLocaleDateString()}`, 105, 280, { align: 'center' });
+                
+                // Use html2canvas to capture card images for the PDF
+                // Process cards in pairs (or individually for full-width cards)
+                let pageNum = 2; // Start page count after title page
+                
+                for (let i = 0; i < cards.length; i += 2) {
+                    // Check if we need a new page
+                    if (i > 0) {
+                        pdf.addPage();
+                    }
+                    
+                    // Set page background color
+                    pdf.setFillColor(isDarkMode() ? '#151515' : '#ffffff');
+                    pdf.rect(0, 0, 210, 297, 'F');
+                    
+                    // Add page number
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(isDarkMode() ? '#999999' : '#777777');
+                    pdf.text(`Page ${pageNum}`, 190, 287, { align: 'right' });
+                    pageNum++;
+                    
+                    const card1 = cards[i];
+                    const isCard1Wide = card1.classList.contains('md:col-span-2');
+                    
+                    // Handle case where first card is wide (takes full page)
+                    if (isCard1Wide) {
+                        await processSingleCard(card1, pdf, 20);
+                        continue;
+                    }
+                    
+                    // Handle the first card of the pair
+                    await processSingleCard(card1, pdf, 20);
+                    
+                    // Check if there's a second card to process
+                    if (i + 1 < cards.length) {
+                        const card2 = cards[i + 1];
+                        const isCard2Wide = card2.classList.contains('md:col-span-2');
+                        
+                        // If second card is wide, it gets its own page
+                        if (isCard2Wide) {
+                            pdf.addPage();
+                            
+                            // Set page background color
+                            pdf.setFillColor(isDarkMode() ? '#151515' : '#ffffff');
+                            pdf.rect(0, 0, 210, 297, 'F');
+                            
+                            // Add page number
+                            pdf.setFontSize(10);
+                            pdf.setTextColor(isDarkMode() ? '#999999' : '#777777');
+                            pdf.text(`Page ${pageNum}`, 190, 287, { align: 'right' });
+                            pageNum++;
+                            
+                            await processSingleCard(card2, pdf, 20);
+                            i++; // Skip this card in next iteration
+                        } else {
+                            // Process second card normally
+                            await processSingleCard(card2, pdf, 155);
+                            i++; // Skip this card in next iteration
+                        }
+                    }
+                }
+                
+                // Save the PDF
+                pdf.save('Siemens_Roundtable_QA.pdf');
+                
+                // Remove loading overlay
+                document.body.removeChild(loadingOverlay);
+                
+                // Show success message
+                const successToast = document.createElement('div');
+                successToast.className = 'fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg z-50';
+                successToast.innerHTML = 'PDF successfully generated!';
+                document.body.appendChild(successToast);
+                
+                // Remove success message after 3 seconds
+                setTimeout(() => {
+                    document.body.removeChild(successToast);
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                
+                // Remove loading overlay
+                document.body.removeChild(loadingOverlay);
+                
+                // Show error message
+                const errorToast = document.createElement('div');
+                errorToast.className = 'fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-6 py-3 rounded-xl shadow-lg z-50';
+                errorToast.innerHTML = `Error generating PDF: ${error.message}`;
+                document.body.appendChild(errorToast);
+                
+                // Remove error message after 5 seconds
+                setTimeout(() => {
+                    document.body.removeChild(errorToast);
+                }, 5000);
+            }
+        });
+        
+        // Process a single card for PDF
+        async function processSingleCard(card, pdf, yPosition) {
+            try {
+                // Get card data
+                const questionNumber = card.getAttribute('data-number');
+                const questionTitle = card.querySelector('h3').textContent.trim();
+                const isWideCard = card.classList.contains('md:col-span-2');
+                
+                // Create a visual clone of the card with styling for PDF
+                const templateContainer = document.getElementById('pdf-template-container');
+                templateContainer.innerHTML = '';
+                
+                // Create a div to hold the cloned card
+                const cardWrapper = document.createElement('div');
+                cardWrapper.style.width = '170mm';
+                cardWrapper.style.margin = '0 auto';
+                cardWrapper.style.padding = '0';
+                cardWrapper.style.position = 'relative';
+                
+                // Create a cloned card with the right styling
+                const cardClone = createCardClone(card, true);
+                cardClone.style.position = 'relative';
+                cardClone.style.width = '100%';
+                cardClone.style.margin = '0';
+                cardClone.style.boxShadow = isDarkMode() ? '0 4px 6px rgba(0, 0, 0, 0.5)' : '0 4px 6px rgba(0, 0, 0, 0.1)';
+                
+                // Add to wrapper
+                cardWrapper.appendChild(cardClone);
+                templateContainer.appendChild(cardWrapper);
+                
+                // Use html2canvas to capture the card as an image
+                const cardImage = await html2canvas(cardClone, {
+                    scale: 2, // Higher quality
+                    logging: false,
+                    backgroundColor: null, // Transparent
+                    useCORS: true
+                });
+                
+                // Calculate dimensions
+                const cardWidth = isWideCard ? 170 : 170; // mm (PDF width)
+                const cardHeight = cardWidth * cardImage.height / cardImage.width;
+                
+                // Add card image to PDF
+                const cardDataUrl = cardImage.toDataURL('image/png');
+                pdf.addImage(cardDataUrl, 'PNG', 20, yPosition, cardWidth, cardHeight);
+                
+                // Clean up
+                templateContainer.innerHTML = '';
+                
+            } catch (err) {
+                console.error('Error processing card:', err);
+                throw err;
+            }
+        }
+
+        // Search functionality
+        document.getElementById('search-input').addEventListener('input', function() {
+            const searchText = this.value.toLowerCase();
+            const cards = document.querySelectorAll('.card');
+            const sections = document.querySelectorAll('h2.text-2xl');
+            
+            // Only search if we have at least 2 characters
+            if (searchText.length < 2 && searchText.length > 0) {
+                return;
+            }
+            
+            let hasMatches = false;
+            
+            cards.forEach(card => {
+                const cardContent = card.getAttribute('data-content').toLowerCase();
+                const cardTitle = card.querySelector('h3').textContent.toLowerCase();
+                
+                if (searchText.length === 0 || cardContent.includes(searchText) || cardTitle.includes(searchText)) {
+                    card.style.display = '';
+                    card.style.opacity = '1';
+                    hasMatches = true;
+                    
+                    // Highlight matching text if searching
+                    if (searchText.length > 0) {
+                        card.style.boxShadow = '0 0 0 2px #009999';
+                    } else {
+                        card.style.boxShadow = '';
+                    }
+                } else {
+                    card.style.opacity = '0.3';
+                }
+            });
+            
+            // Show sections based on search results
+            sections.forEach(section => {
+                section.parentElement.style.display = searchText.length === 0 ? 'block' : 'none';
+            });
+            
+            if (searchText.length > 0 && hasMatches) {
+                const resultsSection = document.getElementById('search-results') || createSearchResultsSection();
+                resultsSection.style.display = 'block';
+                
+                // Move matching cards to results section
+                const resultsContainer = resultsSection.querySelector('.search-results-container');
+                resultsContainer.innerHTML = '';
+                
+                cards.forEach(card => {
+                    if (card.style.opacity !== '0.3') {
+                        const clone = card.cloneNode(true);
+                        clone.style.display = 'block';
+                        resultsContainer.appendChild(clone);
+                    }
+                });
+            } else if (document.getElementById('search-results')) {
+                document.getElementById('search-results').style.display = 'none';
+            }
+        });
+        
+        function createSearchResultsSection() {
+            const searchResultsSection = document.createElement('div');
+            searchResultsSection.id = 'search-results';
+            searchResultsSection.className = 'mb-8';
+            searchResultsSection.innerHTML = `
+                <h2 class="text-2xl font-bold mb-6 text-siemens">Search Results</h2>
+                <div class="search-results-container grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+            `;
+            
+            const allContent = document.getElementById('all-content');
+            allContent.insertBefore(searchResultsSection, allContent.firstChild);
+            
+            return searchResultsSection;
+        }
+    </script>
+
+
+</body></html>
